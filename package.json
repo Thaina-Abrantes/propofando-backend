@@ -1,0 +1,35 @@
+{
+  "name": "api-javascript-express-knex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon",
+    "test": "jest",
+    "migration:create": "knex migrate:make",
+    "migration:revert": "knex migrate:rollback",
+    "migration:run": "knex migrate:latest",
+    "postgres:start": "docker run -d -p $(grep DB_PORT .env | cut -d= -f 2):5432 --name $(grep DB_DATABASE .env | cut -d= -f 2) -e POSTGRES_HOST_AUTH_METHOD=trust postgres:12-alpine",
+    "database:create": "docker exec $(grep DB_DATABASE .env | cut -d= -f 2) psql -U postgres postgres -c \"CREATE DATABASE $(grep DB_DATABASE .env | cut -d= -f 2)\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cubos/knex-repository": "0.0.0-dev.20210122162111",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "joi": "^17.4.2",
+    "joi-translation-pt-br": "0.0.6",
+    "knex": "^0.95.13",
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.14",
+    "supertest": "^6.1.6",
+    "jest": "^27.3.1"
+  }
+}
