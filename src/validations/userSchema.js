@@ -10,6 +10,7 @@ const createUserSchema = yup.object().shape({
     .string()
     .strict()
     .required(),
+    
   age: yup
     .number()
     .required()
