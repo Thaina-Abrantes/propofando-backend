@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@cubos/knex-repository": "0.0.0-dev.20210122162111",
+    "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
