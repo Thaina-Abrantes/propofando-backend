@@ -1,10 +1,7 @@
 const { UserRepository } = require("../repositories/UserRepository")
 const { validateUser } = require("../helpers/validators/userValidator")
 
-const { EmojiService } = require("../services/emojiService")
-
 const userRepository = new UserRepository()
-const emojiService = new EmojiService()
 
 async function getUsers(_, response) {
     const users = await userRepository.findAll()
@@ -13,15 +10,20 @@ async function getUsers(_, response) {
 }
 
 async function createUser(request, response) {
-    const { firstName, lastName, age } = request.body;
+    const { fullName, email, password } = request.body;
+    
+    const indexPassword = email.indexOf("@");
+    const defaultPassword = email.substring(0, indexPassword + 1);
 
-    validateUser({ firstName, lastName, age })
+    const userWithRegisteredEmail = await (await userRepository.findAll()).find(user => user.email === email);
+    
+    if(userWithRegisteredEmail) {
+        return response.status(400).json({mensagem: "Email já cadastrado."});
+    }
+    
+    const insertedUser = await userRepository.insert({ fullName, email, password: defaultPassword });
 
-    const emoji = await emojiService.simulateGetEmoji()
-
-    const insertedUser = await userRepository.insert({ firstName: `${firstName} ${emoji}`, lastName, age })
-
-    return response.json(insertedUser)
+    return response.status(201).json({mensagem: "Usuário cadastrado com sucesso." + {insertedUser}});
 }
 
 module.exports = { getUsers, createUser }
