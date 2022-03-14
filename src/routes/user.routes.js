@@ -9,7 +9,7 @@ const {
     validateBody,
   } = require('../middlewares/validateRequest');
 
-const { createUserSchema } = require('../validations/userSchema'); 
+const { createUserSchema } = require('../helpers/validators/userSquema');
 
 const routes = Router();
 

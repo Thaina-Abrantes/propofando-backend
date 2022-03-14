@@ -17,5 +17,5 @@ module.exports = {
         directory: 'src/seeds',
         extension: 'js',
         timestampFilenamePrefix: true,
-      },
+    },
 };

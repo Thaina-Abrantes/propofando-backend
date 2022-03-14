@@ -1,11 +1,6 @@
-const { UserRepository } = require('../../repositories/UserRepository');
+const { UserRepository } = require('../repositories/UserRepository');
 
 const userRepository = new UserRepository();
-
-
-function joiErrorToJavaScriptError(error) {
-    return Error(error.message.replace(/"/g, "'"))
-}
 
 const err = {
     success: true,
@@ -13,12 +8,12 @@ const err = {
   };
   
 function generateError(success, message) {
-const erro = {
-    success,
-    message,
-};
+  const erro = {
+      success,
+      message,
+  };
 
-return erro;
+  return erro;
 }
 
 async function verifyDuplicatedUsers(email) {
@@ -33,7 +28,7 @@ async function verifyDuplicatedUsers(email) {
 }
 
 
+
 module.exports = { 
-    joiErrorToJavaScriptError, 
     verifyDuplicatedUsers,
 }
