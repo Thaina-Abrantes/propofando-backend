@@ -1,19 +1,18 @@
-const yup = require('yup');
+const Joi = require('joi');
 
-const createUserSchema = yup.object().shape({
-  firstName: yup
-    .string()
+const createUserSchema = Joi.object().keys({
+  name: Joi.string()
+    .alphanum()
+    .required(),
+
+  email: Joi.string()
+    .email()
     .strict()
     .required(),
 
-  lastName: yup
-    .string()
+  password: Joi.string()
     .strict()
     .required(),
-    
-  age: yup
-    .number()
-    .required()
 });
 
 module.exports = {

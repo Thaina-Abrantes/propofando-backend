@@ -1,10 +1,6 @@
 const { UserRepository } = require("../repositories/UserRepository")
-const { validateUser } = require("../helpers/validators/userValidator")
-
-const { EmojiService } = require("../services/emojiService")
 
 const userRepository = new UserRepository()
-const emojiService = new EmojiService()
 
 async function getUsers(_, response) {
     const users = await userRepository.findAll()
@@ -13,15 +9,13 @@ async function getUsers(_, response) {
 }
 
 async function createUser(request, response) {
-    const { firstName, lastName, age } = request.body;
+    const { name, email, password } = request.body;
 
-    validateUser({ firstName, lastName, age })
+    const insertedUser = await userRepository.insert({
+        name, email, password
+    })
 
-    const emoji = await emojiService.simulateGetEmoji()
-
-    const insertedUser = await userRepository.insert({ firstName: `${firstName} ${emoji}`, lastName, age })
-
-    return response.json(insertedUser)
+    return response.json(insertedUser);
 }
 
 module.exports = { getUsers, createUser }
