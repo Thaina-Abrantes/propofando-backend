@@ -7,6 +7,7 @@ const { exampleMiddleware } = require('../middlewares/example')
 const routes = Router();
 
 const userRoutes = require('./user.routes');
+const loginRoutes = require('./login.routes');
 
 routes.get("/", exampleMiddleware, (request, response) => {
     const name = request.cookies?.user.name;
@@ -14,6 +15,7 @@ routes.get("/", exampleMiddleware, (request, response) => {
 });
 
 routes.use(userRoutes);
+routes.use(loginRoutes);
 
 routes.use(globalErrorHandler)
 

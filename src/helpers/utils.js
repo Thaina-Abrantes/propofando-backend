@@ -27,6 +27,15 @@ async function verifyDuplicatedEmail(email) {
     return error;
 }
 
+function clearUserObject(user) {
+  delete user.password;
+  delete user.createdAt;
+  delete user.updatedAt;
+
+  return user;
+}
+
 module.exports = { 
     verifyDuplicatedEmail,
+    clearUserObject,
 }
