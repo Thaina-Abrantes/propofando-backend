@@ -1,4 +1,4 @@
-const { encryptPassword } = require('../src/helpers/handlePassword');
+const { encryptPassword } = require('../helpers/handlePassword');
 
 exports.seed = async function (knex) {
   const encryptedPassword = await encryptPassword(process.env.SUPER_ADMIN_PWD);
