@@ -16,7 +16,7 @@ function generateError(success, message) {
   return erro;
 }
 
-async function verifyDuplicatedUsers(email) {
+async function verifyDuplicatedEmail(email) {
     let error = err;
   
     const registeredUser = await userRepository.findOneBy({ email });
@@ -27,8 +27,6 @@ async function verifyDuplicatedUsers(email) {
     return error;
 }
 
-
-
 module.exports = { 
-    verifyDuplicatedUsers,
+    verifyDuplicatedEmail,
 }
