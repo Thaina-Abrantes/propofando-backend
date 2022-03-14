@@ -9,6 +9,8 @@
     "migration:create": "knex migrate:make",
     "migration:revert": "knex migrate:rollback",
     "migration:run": "knex migrate:latest",
+    "seed:create": "knex seed:make",
+    "seed:run": "knex seed:run",
     "postgres:start": "docker run -d -p $(grep DB_PORT .env | cut -d= -f 2):5432 --name $(grep DB_DATABASE .env | cut -d= -f 2) -e POSTGRES_HOST_AUTH_METHOD=trust postgres:12-alpine",
     "database:create": "docker exec $(grep DB_DATABASE .env | cut -d= -f 2) psql -U postgres postgres -c \"CREATE DATABASE $(grep DB_DATABASE .env | cut -d= -f 2)\""
   },
