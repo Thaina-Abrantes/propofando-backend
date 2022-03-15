@@ -1,10 +1,8 @@
-const { UserRepository } = require("../repositories/UserRepository")
-const { validateUser } = require("../helpers/validators/userValidator")
-
-const { EmojiService } = require("../services/emojiService")
+const { UserRepository } = require("../repositories/UserRepository");
+const { validateUser } = require("../helpers/validators/userValidator");
+const bcrypt = require('bcrypt');
 
 const userRepository = new UserRepository()
-const emojiService = new EmojiService()
 
 async function getUsers(_, response) {
     const users = await userRepository.findAll()
@@ -13,15 +11,25 @@ async function getUsers(_, response) {
 }
 
 async function createUser(request, response) {
-    const { firstName, lastName, age } = request.body;
+    const { fullName, email, password } = request.body;
+    
+    validateUser({ fullName, email });
 
-    validateUser({ firstName, lastName, age })
+    const registeredEmail = await userRepository.findBy({email});
 
-    const emoji = await emojiService.simulateGetEmoji()
+    if (registeredEmail.length !== 0) {
+        return response.status(400).json({ mensagem: "Email já cadastrado." });
+    }
 
-    const insertedUser = await userRepository.insert({ firstName: `${firstName} ${emoji}`, lastName, age })
+    const indexPassword = email.indexOf("@");
+    const defaultPassword = email.substring(0, indexPassword + 1);
 
-    return response.json(insertedUser)
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(defaultPassword, salt);
+
+    await userRepository.insert({ fullName, email, password: hash });
+
+    return response.status(201).json({ mensagem: "Usuário cadastrado com sucesso." });
 }
 
 module.exports = { getUsers, createUser }
