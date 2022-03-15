@@ -1,21 +1,16 @@
 const Joi = require('joi');
 const { messages } = require('joi-translation-pt-br');
-const { joiErrorToJavaScriptError } = require('./helper')
+const { joiErrorToJavaScriptError } = require('./helper');
 
-function validateUser({ firstName, lastName, age }) {
+function validateUser({ fullName, email }) {
     const schema = Joi.object().keys({
-        firstName: Joi.string()
+        fullName: Joi.string()
             .required(),
 
-        lastName: Joi.string()
-            .required(),
-
-        age: Joi.number()
-            .integer()
-            .min(18)
+        email: Joi.string()
             .required(),
     });
-    const validation = schema.validate({ firstName, lastName, age }, { messages })
+    const validation = schema.validate({ fullName, email }, { messages })
     if (validation.error) throw joiErrorToJavaScriptError(validation.error)
 }
 
