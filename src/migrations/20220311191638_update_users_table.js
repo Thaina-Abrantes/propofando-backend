@@ -8,6 +8,8 @@ exports.up = async function (knex) {
         table.string("email").notNullable();
         table.string("password").notNullable();
         table.string("userType").defaultTo("student");
+        table.boolean("active").defaultTo(true);
+        table.boolean("inactive").defaultTo(false);
     });
 };
 exports.down = async function (knex) {
