@@ -14,6 +14,13 @@ const createUserSchema = yup.object().shape({
   password: yup.string(),
 });
 
+const validateUuidSchema = yup.object().shape({
+  id: yup.string()
+    .uuid()
+    .required(),
+});
+
 module.exports = {
   createUserSchema,
+  validateUuidSchema,
 };
