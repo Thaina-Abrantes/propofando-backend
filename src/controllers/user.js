@@ -1,8 +1,9 @@
-const { UserRepository } = require("../repositories/UserRepository");
-const { validateUser } = require("../helpers/validators/userValidator");
-const bcrypt = require('bcrypt');
+const { UserRepository } = require("../repositories/UserRepository")
 
 const userRepository = new UserRepository()
+
+const { encryptPassword } = require("../helpers/handlePassword");
+const { verifyDuplicatedEmail } = require("../helpers/utils");
 
 async function getUsers(_, response) {
     const users = await userRepository.findAll()
@@ -11,25 +12,28 @@ async function getUsers(_, response) {
 }
 
 async function createUser(request, response) {
-    const { fullName, email, password } = request.body;
-    
-    validateUser({ fullName, email });
+    const { name, email, password } = request.body;
 
-    const registeredEmail = await userRepository.findBy({email});
+    const registeredEmail = await verifyDuplicatedEmail(email);
 
-    if (registeredEmail.length !== 0) {
-        return response.status(400).json({ mensagem: "Email já cadastrado." });
+    if (!registeredEmail.success) {
+        return response.status(400).json({
+            success: false, 
+            messageError: registeredEmail.message 
+        });
     }
 
     const indexPassword = email.indexOf("@");
     const defaultPassword = email.substring(0, indexPassword + 1);
 
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(defaultPassword, salt);
+    const encryptedPassword = await encryptPassword(defaultPassword);
 
-    await userRepository.insert({ fullName, email, password: hash });
+    await userRepository.insert({ name, email, password: encryptedPassword });
 
-    return response.status(201).json({ mensagem: "Usuário cadastrado com sucesso." });
+    return response.status(201).json({ 
+        success: true,
+        mensagem: 'Usuário cadastrado com sucesso.'
+    });
 }
 
 module.exports = { getUsers, createUser }

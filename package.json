@@ -9,6 +9,8 @@
     "migration:create": "knex migrate:make",
     "migration:revert": "knex migrate:rollback",
     "migration:run": "knex migrate:latest",
+    "seed:create": "knex seed:make",
+    "seed:run": "knex seed:run",
     "postgres:start": "docker run -d -p $(grep DB_PORT .env | cut -d= -f 2):5432 --name $(grep DB_DATABASE .env | cut -d= -f 2) -e POSTGRES_HOST_AUTH_METHOD=trust postgres:12-alpine",
     "database:create": "docker exec $(grep DB_DATABASE .env | cut -d= -f 2) psql -U postgres postgres -c \"CREATE DATABASE $(grep DB_DATABASE .env | cut -d= -f 2)\""
   },
@@ -17,20 +19,22 @@
   "license": "ISC",
   "dependencies": {
     "@cubos/knex-repository": "0.0.0-dev.20210122162111",
-    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
-    "joi": "^17.4.2",
-    "joi-translation-pt-br": "0.0.6",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.13",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "uuid": "^8.3.2",
+    "yup": "^0.32.11",
+    "yup-locales": "^1.2.2"
   },
   "devDependencies": {
+    "jest": "^27.3.1",
     "nodemon": "^2.0.14",
-    "supertest": "^6.1.6",
-    "jest": "^27.3.1"
+    "supertest": "^6.1.6"
   }
 }
