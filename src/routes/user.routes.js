@@ -5,9 +5,9 @@ const {
     createUser,
  } = require('../controllers/user');
 
-const {
-    validateBody,
-  } = require('../middlewares/validateRequest');
+const { validateBody } = require('../middlewares/validateRequest');
+const authentication = require('../middlewares/authentication');
+
 
 const { createUserSchema } = require('../helpers/validators/userSquema');
 
@@ -20,6 +20,7 @@ routes.get(
 
 routes.post(
     '/users',
+    authentication,
     validateBody(createUserSchema),
     createUser,
 );

@@ -29,9 +29,9 @@ async function login(request, response) {
 
   const formattedUser = clearUserObject(registeredUser);
 
-  const token = await generateToken({
+  const token = generateToken({
     id: formattedUser.id,
-    name: formattedUser.name,
+    email: formattedUser.email,
     userType: formattedUser.userType,
   });
 
