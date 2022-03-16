@@ -22,7 +22,7 @@ async function verifyDuplicatedEmail(email) {
     const registeredUser = await userRepository.findOneBy({ email });
   
     if (registeredUser) {
-      error = generateError(false, 'Informe um email diferente.');
+      error = generateError(false, 'Email já cadastrado! Informe um email diferente.');
     }
     return error;
 }
