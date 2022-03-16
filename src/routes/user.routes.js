@@ -7,7 +7,7 @@ const {
 
 const { validateBody } = require('../middlewares/validateRequest');
 const authentication = require('../middlewares/authentication');
-
+const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
 const { createUserSchema } = require('../helpers/validators/userSquema');
 
@@ -21,6 +21,7 @@ routes.get(
 routes.post(
     '/users',
     authentication,
+    validateAccessPermission(['super admin']),
     validateBody(createUserSchema),
     createUser,
 );

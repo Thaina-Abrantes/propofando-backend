@@ -11,8 +11,8 @@ async function authentication(request, response, next){
 
     if (!authorization) {
       return response.status(401).json({
-        status: false, 
-        message:'Autenticação necessária! Por favor efetue o login.'
+        success: false, 
+        messageError:'Autenticação necessária! Por favor efetue o login.'
       });
     }
 
@@ -27,7 +27,7 @@ async function authentication(request, response, next){
     if (!registeredUser) {
       return response.status(400).json({
         success: false, 
-        message:'Token inválido!'
+        messageError:'Token inválido!'
       });
     }
 
@@ -39,7 +39,7 @@ async function authentication(request, response, next){
   } catch (error) {
     return response.status(400).json({
       success: false, 
-      message:'Erro de autenticação!' 
+      messageError:'Erro de autenticação!' 
     });
   }
 }
