@@ -3,7 +3,7 @@ const { UserRepository } = require("../repositories/UserRepository")
 const userRepository = new UserRepository()
 
 const { encryptPassword } = require("../helpers/handlePassword");
-const { verifyDuplicatedEmail } = require("../helpers/utils");
+const { verifyDuplicatedEmail, passwordEdit } = require("../helpers/utils");
 
 async function getUsers(_, response) {
     const users = await userRepository.findAll()
@@ -23,13 +23,12 @@ async function createUser(request, response) {
         });
     }
 
-    const indexPassword = email.indexOf("@");
-    const defaultPassword = email.substring(0, indexPassword + 1);
-
+    const defaultPassword = await passwordEdit(email);
+    
     const encryptedPassword = await encryptPassword(defaultPassword);
-
+    
     await userRepository.insert({ name, email, password: encryptedPassword });
-
+    
     return response.status(201).json({ 
         success: true,
         message: 'Usuário cadastrado com sucesso.'
@@ -40,13 +39,6 @@ async function deleteUser(request, response) {
     const { id } = request.params;
     
     const existedUser = await userRepository.get(id);
-
-    if (!existedUser) {
-        return response.status(404).json({
-            success: false, 
-            messageError: "Usuário não encontrado."
-        });
-    }
 
     if (!existedUser) {
         return response.status(404).json({
