@@ -10,6 +10,7 @@ const { addTime } = require("../helpers/handleDate");
 const { generateUuid } = require("../helpers/handleUuid");
 
 const { sendMail } = require('../services/sendMail');
+const { generateTransaction } = require("../helpers/handleTransaction");
 
 
 async function getUsers(_, response) {
@@ -48,7 +49,7 @@ async function passwordResetEmail(request, response) {
 
     const user = await userRepository.findOneBy({ email });
   
-    if (!user) {
+    if (!user || user?.userType === 'super admin') {
         return response.status(404).json({
             success:false,
             message: `Não foi possível enviar um email para ${email}. Favor verifique se o email informado está correto.`
@@ -58,24 +59,26 @@ async function passwordResetEmail(request, response) {
     const creationDate = new Date();
     const urlCode = generateUuid(user.email);
     const expiredAt = addTime(creationDate, { hours: 1 });
-  
-    const insertedInfo = await recoveryRepository.insert({
+
+    const transaction = await generateTransaction();
+
+    const insertedInfo = await recoveryRepository.withTransaction(transaction).insert({
         urlCode, 
         expiredAt,
         userId: user.id,
     });
   
     if (!insertedInfo) {
-        return response.status(404).json({
-            sucess:false,
+        return response.status(400).json({
+            success:false,
             message: `Ops! Não foi possível enviar um email para ${email}.`
         });
     }
   
     const mailOptions = {
-        from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER}>`,
+        from: 'Propofando <não-responda@propofando.com>',
         to: email,
-        subject: 'Propofando - Redefinição de senha',
+        subject: 'Redefinição de senha',
         template: 'recovery-password/index',
         context: {
             user: user.name,
@@ -87,12 +90,13 @@ async function passwordResetEmail(request, response) {
     const emailSent = await sendMail(mailOptions);
   
     if (!emailSent) {
-        console.log(emailSent);
       return response.status(400).json({
-          sucess:false,
-          message: `Não foi possível enviar um email para ${email}.`
+          success:false,
+          message: `Não foi possível enviar um email para ${email}. Verifique o email fornecido.`
       });
     }
+
+    transaction.commit();
   
     return response.status(200).json({
         success: true,
