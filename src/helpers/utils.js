@@ -3,28 +3,35 @@ const { UserRepository } = require('../repositories/UserRepository');
 const userRepository = new UserRepository();
 
 const err = {
-    success: true,
-    message: '',
-  };
-  
+  success: true,
+  message: '',
+};
+
 function generateError(success, message) {
   const erro = {
-      success,
-      message,
+    success,
+    message,
   };
 
   return erro;
 }
 
 async function verifyDuplicatedEmail(email) {
-    let error = err;
-  
-    const registeredUser = await userRepository.findOneBy({ email });
-  
-    if (registeredUser) {
-      error = generateError(false, 'Email já cadastrado! Informe um email diferente.');
-    }
-    return error;
+  let error = err;
+
+  const registeredUser = await userRepository.findOneBy({ email });
+
+  if (registeredUser) {
+    error = generateError(false, 'Email já cadastrado! Informe um email diferente.');
+  }
+  return error;
+}
+
+async function passwordEdit(email) {
+  const indexPassword = email.indexOf("@");
+  const preparedPassword = email.substring(0, indexPassword + 1);
+
+  return preparedPassword;
 }
 
 function clearUserObject(user) {
@@ -35,7 +42,8 @@ function clearUserObject(user) {
   return user;
 }
 
-module.exports = { 
-    verifyDuplicatedEmail,
-    clearUserObject,
+module.exports = {
+  verifyDuplicatedEmail,
+  clearUserObject,
+  passwordEdit,
 }
