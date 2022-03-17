@@ -14,6 +14,14 @@ const createUserSchema = yup.object().shape({
   password: yup.string(),
 });
 
+const validateEmailSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email()
+    .required(),
+});
+
 module.exports = {
   createUserSchema,
+  validateEmailSchema,
 };

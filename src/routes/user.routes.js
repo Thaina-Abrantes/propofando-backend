@@ -10,7 +10,10 @@ const { validateBody } = require('../middlewares/validateRequest');
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-const { createUserSchema } = require('../helpers/validators/userSquema');
+const { 
+    createUserSchema,
+    validateEmailSchema,
+} = require('../helpers/validators/userSquema');
 
 const routes = Router();
 
@@ -29,7 +32,7 @@ routes.post(
 
 routes.post(
     '/users/recovery', 
-    //validateBody(),
+    validateBody(validateEmailSchema),
     passwordResetEmail,
 );
 
