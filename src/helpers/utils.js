@@ -27,6 +27,17 @@ async function verifyDuplicatedEmail(email) {
   return error;
 }
 
+async function verifyDuplicatedEmailWithoutMe(id, email) {
+  let error = err;
+
+  const registeredUser = await userRepository.findOneBy({ email: email });
+
+  if (registeredUser && registeredUser.id !== id) {
+    error = generateError(false, 'Email já cadastrado! Informe um email diferente.');
+  }
+  return error;
+}
+
 async function passwordEdit(email) {
   const indexPassword = email.indexOf("@");
   const preparedPassword = email.substring(0, indexPassword + 1);
@@ -38,6 +49,7 @@ function clearUserObject(user) {
   delete user.password;
   delete user.createdAt;
   delete user.updatedAt;
+  delete user.deleted;
 
   return user;
 }
@@ -46,4 +58,5 @@ module.exports = {
   verifyDuplicatedEmail,
   clearUserObject,
   passwordEdit,
+  verifyDuplicatedEmailWithoutMe
 }
