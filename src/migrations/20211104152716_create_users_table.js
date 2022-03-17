@@ -9,7 +9,8 @@ exports.up = async function (knex) {
         table.string('email').notNullable();
         table.string('password').notNullable();
         table.string('userType').defaultTo('student');
-        table.string('status').defaultTo('active');
+        table.boolean('active').defaultTo(true);
+        table.boolean('deleted').defaultTo(false);
     });
 };
 

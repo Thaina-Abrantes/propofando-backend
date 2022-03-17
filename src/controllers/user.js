@@ -47,7 +47,7 @@ async function deleteUser(request, response) {
         });
     }
     
-    const deletedUser = await userRepository.update({id, status:'deleted'});
+    const deletedUser = await userRepository.update({id, active:'false', deleted: 'true'});
     
     if (!deletedUser) {
         return response.status(400).json({
