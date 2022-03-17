@@ -5,10 +5,17 @@ const userRepository = new UserRepository()
 const { encryptPassword } = require("../helpers/handlePassword");
 const { verifyDuplicatedEmail, passwordEdit } = require("../helpers/utils");
 
-async function getUsers(_, response) {
-    const users = await userRepository.findAll()
+async function listUsers(_, response) {
+    const allUsers = await userRepository.findAll();
 
-    return response.json(users)
+    const notDeletedUsers = allUsers.filter(user => user.deleted === false);
+
+    const users = notDeletedUsers.map(user => [user.name, user.email]);
+    
+    return response.status(201).json({ 
+        success: true,
+        users
+    });
 }
 
 async function createUser(request, response) {
@@ -62,4 +69,4 @@ async function deleteUser(request, response) {
     });
 }
 
-module.exports = { getUsers, createUser, deleteUser }
+module.exports = { listUsers, createUser, deleteUser }

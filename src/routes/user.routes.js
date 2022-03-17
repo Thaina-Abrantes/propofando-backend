@@ -1,7 +1,7 @@
 const { Router } = require('express');
 
 const { 
-    getUsers, 
+    listUsers, 
     createUser,
     deleteUser
  } = require('../controllers/user');
@@ -16,7 +16,9 @@ const routes = Router();
 
 routes.get(
     '/users',
-     getUsers,
+    authentication,
+    validateAccessPermission(['super admin']),
+     listUsers,
 );
 
 routes.post(
