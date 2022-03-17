@@ -73,7 +73,15 @@ async function passwordResetEmail(request, response) {
     }
   
     const mailOptions = {
-      
+        from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER}>`,
+        to: email,
+        subject: 'Propofando - Redefinição de senha',
+        template: 'recovery-password/index',
+        context: {
+            user: user.name,
+            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}/${urlCode}`,
+            emailContact: process.env.EMAIL_PROPOFANDO
+        },
     };
   
     const emailSent = await sendMail(mailOptions);
