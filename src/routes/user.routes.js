@@ -3,6 +3,7 @@ const { Router } = require('express');
 const { 
     getUsers, 
     createUser,
+    passwordResetEmail,
  } = require('../controllers/user');
 
 const { validateBody } = require('../middlewares/validateRequest');
@@ -24,6 +25,12 @@ routes.post(
     validateAccessPermission(['super admin']),
     validateBody(createUserSchema),
     createUser,
+);
+
+routes.post(
+    '/users/recovery', 
+    //validateBody(),
+    passwordResetEmail,
 );
 
 module.exports = routes;
