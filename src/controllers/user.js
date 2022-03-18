@@ -80,7 +80,7 @@ async function passwordResetEmail(request, response) {
         template: 'recovery-password/index',
         context: {
             user: user.name,
-            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}/${resetToken}`,
+            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}?token=${resetToken}`,
             emailContact: process.env.EMAIL_PROPOFANDO
         },
     };
@@ -104,7 +104,7 @@ async function passwordResetEmail(request, response) {
 async function updatePassword(request, response) {
     const { token } = request.query;
     const { password } = request.body;
-  
+    
     const registeredToken = await recoveryRepository.findOneBy({ token });
   
     if (!registeredToken) {
