@@ -47,11 +47,10 @@ async function createUser(request, response) {
 async function passwordResetEmail(request, response) {
     const { email } = request.body;
 
-    const user = await userRepository.findOneBy({ email });
+    const user = await userRepository.findOneBy({ email, userType: 'student' });
   
-    if (!user || user?.userType === 'super admin') {
+    if (!user) {
         return response.status(404).json({
-            success:false,
             message: `Não foi possível enviar um email para ${email}. Favor verifique se o email informado está correto.`
         });
     }
@@ -70,7 +69,6 @@ async function passwordResetEmail(request, response) {
   
     if (!insertedInfo) {
         return response.status(400).json({
-            success:false,
             message: `Ops! Não foi possível enviar um email para ${email}.`
         });
     }
@@ -91,7 +89,6 @@ async function passwordResetEmail(request, response) {
   
     if (!emailSent) {
       return response.status(400).json({
-          success:false,
           message: `Não foi possível enviar um email para ${email}. Verifique o email fornecido.`
       });
     }
@@ -99,7 +96,6 @@ async function passwordResetEmail(request, response) {
     transaction.commit();
   
     return response.status(200).json({
-        success: true,
         message: `O email foi enviado para ${email} com um link para resetar sua senha.`,
     });
 
