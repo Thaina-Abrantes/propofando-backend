@@ -6,7 +6,7 @@ const recoveryRepository = new RecoveryRepository();
 
 const { encryptPassword } = require("../helpers/handlePassword");
 const { verifyDuplicatedEmail } = require("../helpers/utils");
-const { addTime } = require("../helpers/handleDate");
+const { addTime, checkIsValidDate } = require("../helpers/handleDate");
 const { generateUuid } = require("../helpers/handleUuid");
 
 const { sendMail } = require('../services/sendMail');
@@ -56,13 +56,13 @@ async function passwordResetEmail(request, response) {
     }
     
     const creationDate = new Date();
-    const urlCode = generateUuid(user.email);
+    const resetToken = generateUuid(user.email);
     const expiredAt = addTime(creationDate, { hours: 1 });
 
     const transaction = await generateTransaction();
 
     const insertedInfo = await recoveryRepository.withTransaction(transaction).insert({
-        urlCode, 
+        token: resetToken, 
         expiredAt,
         userId: user.id,
     });
@@ -80,7 +80,7 @@ async function passwordResetEmail(request, response) {
         template: 'recovery-password/index',
         context: {
             user: user.name,
-            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}/${urlCode}`,
+            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}/${resetToken}`,
             emailContact: process.env.EMAIL_PROPOFANDO
         },
     };
@@ -99,10 +99,44 @@ async function passwordResetEmail(request, response) {
         message: `O email foi enviado para ${email} com um link para resetar sua senha.`,
     });
 
-}                                             
+}   
+
+async function updatePassword(request, response) {
+    const { token } = request.query;
+    const { password } = request.body;
+  
+    const registeredToken = await recoveryRepository.findOneBy({ token });
+  
+    if (!registeredToken) {
+        return response.status(404).json({
+            message: 'Ação inválida. Solicite novamente uma nova senha.'
+        });
+    }
+  
+    const tokenExpired = checkIsValidDate(new Date(), registeredToken.expiratedAt);
+  
+    if (!tokenExpired) {
+        return response.status(400).json({
+            message: 'Solicitação expirada. Solicite novamente uma nova senha.'
+        });
+    }
+  
+    const encryptedPassword = await encryptPassword(password);
+  
+    const updatedPassword = await userRepository.update({
+        id: registeredToken.userId, password: encryptedPassword
+    });
+  
+    if (!updatedPassword) {
+      return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
+    }
+  
+    return response.status(200).json({message: 'Senha atualizada!'});
+  }
 
 module.exports = { 
     getUsers,
     createUser,
     passwordResetEmail,
+    updatePassword,
 }
