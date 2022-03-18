@@ -1,9 +1,11 @@
 const { Router } = require('express');
 
 const { 
-    getUsers, 
+    getUser,
+    listUsers, 
     createUser,
     deleteUser,
+    updateUser,
     passwordResetEmail,
     updatePassword,
  } = require('../controllers/user');
@@ -28,8 +30,18 @@ const {
 const routes = Router();
 
 routes.get(
+    '/users/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    getUser,
+);
+
+routes.get(
     '/users',
-     getUsers,
+    authentication,
+    validateAccessPermission(['super admin']),
+    listUsers,
 );
 
 routes.post(
@@ -46,6 +58,15 @@ routes.delete(
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
     deleteUser,
+);
+
+routes.patch(
+    '/users/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    validateBody(createUserSchema),
+    updateUser,
 );
 
 routes.post(
