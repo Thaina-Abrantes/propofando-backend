@@ -113,9 +113,9 @@ async function updatePassword(request, response) {
         });
     }
   
-    const tokenExpired = checkIsValidDate(new Date(), registeredToken.expiratedAt);
+    const tokenExpired = await checkIsValidDate(new Date(), registeredToken.expiredAt);
   
-    if (!tokenExpired) {
+    if (tokenExpired) {
         return response.status(400).json({
             message: 'Solicitação expirada. Solicite novamente uma nova senha.'
         });
