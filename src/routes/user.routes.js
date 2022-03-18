@@ -3,21 +3,28 @@ const { Router } = require('express');
 const { 
     getUsers, 
     createUser,
+    deleteUser,
     passwordResetEmail,
     updatePassword,
  } = require('../controllers/user');
 
-const { validateBody, validateQuery } = require('../middlewares/validateRequest');
+const { 
+    validateBody,
+    validateParams,
+    validateQuery 
+} = require('../middlewares/validateRequest');
+
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
 const { 
     createUserSchema,
+    validateUuidSchema,
     validateEmailSchema,
     validateTokenSquema,
     validateUpdatePasswordSquema,
 } = require('../helpers/validators/userSquema');
-
+ 
 const routes = Router();
 
 routes.get(
@@ -31,6 +38,14 @@ routes.post(
     validateAccessPermission(['super admin']),
     validateBody(createUserSchema),
     createUser,
+);
+
+routes.delete(
+    '/users/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    deleteUser,
 );
 
 routes.post(
