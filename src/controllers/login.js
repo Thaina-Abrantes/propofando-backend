@@ -12,19 +12,13 @@ async function login(request, response) {
   const registeredUser = await userRepository.findOneBy({ email });
 
   if (!registeredUser) {
-    return response.status(400).json({ 
-      success: false, 
-      messageError:'Email e/ou senha informados são inválidos.'
-    });
+    return response.status(400).json({ message: 'Email e/ou senha informados são inválidos.' });
   }
 
   const verifiedPassword = await comparePasswords(password, registeredUser.password);
 
-  if (!verifiedPassword ) {
-    return response.status(400).json({
-      success: false, 
-      messageError:'Email e/ou senha informados são inválidos.' 
-    });
+  if (!verifiedPassword) {
+    return response.status(400).json({ message: 'Email e/ou senha informados são inválidos.' });
   }
 
   const formattedUser = clearUserObject(registeredUser);
@@ -35,7 +29,7 @@ async function login(request, response) {
     userType: formattedUser.userType,
   });
 
-  return response.status(200).json({ success: true, user: registeredUser, token });
+  return response.status(200).json({ user: registeredUser, token });
 }
 
 module.exports = { login };

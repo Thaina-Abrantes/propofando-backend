@@ -5,16 +5,10 @@ const validateAccessPermission = (userTypesToBeValidated) => async (request, res
     if (userTypesToBeValidated.includes(userType)) {
       next();
     } else {
-      return response.status(403).json({
-        success: false, 
-        messageError:'Você não tem permissão para prosseguir.'
-      });
+      return response.status(403).json({ message: 'Você não tem permissão para prosseguir.' });
     }
   } catch (error) {
-    return response.status(400).json({
-        success: false, 
-        messageError:'Erro de acesso'
-      });
+    return response.status(400).json({ message: 'Erro de acesso' });
   }
 };
 

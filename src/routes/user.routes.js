@@ -1,9 +1,11 @@
 const { Router } = require('express');
 
 const { 
-    getUsers, 
+    getUser,
+    listUsers, 
     createUser,
-    deleteUser
+    deleteUser,
+    updateUser
  } = require('../controllers/user');
 
 const { validateBody, validateParams } = require('../middlewares/validateRequest');
@@ -15,8 +17,18 @@ const { createUserSchema, validateUuidSchema } = require('../helpers/validators/
 const routes = Router();
 
 routes.get(
+    '/users/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    getUser,
+);
+
+routes.get(
     '/users',
-     getUsers,
+    authentication,
+    validateAccessPermission(['super admin']),
+    listUsers,
 );
 
 routes.post(
@@ -33,6 +45,15 @@ routes.delete(
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
     deleteUser,
+);
+
+routes.patch(
+    '/users/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    validateBody(createUserSchema),
+    updateUser,
 );
 
 module.exports = routes;
