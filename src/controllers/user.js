@@ -8,7 +8,7 @@ const { verifyDuplicatedEmail, passwordEdit, clearUserObject, verifyDuplicatedEm
 async function getUser(request, response) {
     const { id } = request.params;
 
-    const user = await userRepository.findOneBy(id);
+    const user = await userRepository.findOneBy({ id });
 
     if (!user) {
         return response.status(404).json({ message: "Usuário não encontrado." });
