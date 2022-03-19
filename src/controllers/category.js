@@ -14,7 +14,6 @@ async function createCategory(request, response) {
     }
 
     await categoryRepository.insert({ name });
-    console.log(name)
 
     return response.status(201).json({ message: 'Categoria cadastrada com sucesso.' });
 }
