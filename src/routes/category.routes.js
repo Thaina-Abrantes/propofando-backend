@@ -3,7 +3,8 @@ const { Router } = require('express');
 const { 
     createCategory,
     listCategories,
-    getCategory
+    getCategory,
+    deleteCategory
  } = require('../controllers/category');
 
 const { validateBody, validateParams } = require('../middlewares/validateRequest');
@@ -37,5 +38,12 @@ routes.post(
     createCategory,
 );
 
+routes.delete(
+    '/categories/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    deleteCategory,
+);
 
 module.exports = routes;

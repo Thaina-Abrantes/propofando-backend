@@ -38,4 +38,22 @@ async function getCategory(request, response) {
     return response.status(201).json(cleanedCategory);
 }
 
-module.exports = { createCategory, listCategories, getCategory }
+async function deleteCategory(request, response) {
+    const { id } = request.params;
+
+    const category = await categoryRepository.findOneBy({ id });
+
+    if (!category) {
+        return response.status(404).json({ message: "Categoria não encontrada." });
+    }
+
+    const deletedCategory = await categoryRepository.delete(id);
+
+    if (!deletedCategory) {
+        return response.status(400).json({ message: "Erro ao deletar categoria." });
+    }
+
+    return response.status(200).json({ message: 'Categoria deletada com sucesso.' });
+}
+
+module.exports = { createCategory, listCategories, getCategory, deleteCategory }
