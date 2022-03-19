@@ -1,8 +1,9 @@
 const { Router } = require('express');
 
 const { 
+    createCategory,
     listCategories,
-    createCategory
+    getCategory
  } = require('../controllers/category');
 
 const { validateBody, validateParams } = require('../middlewares/validateRequest');
@@ -13,6 +14,13 @@ const { createCategorySchema, validateUuidSchema } = require('../helpers/validat
 
 const routes = Router();
 
+routes.get(
+    '/categories/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    getCategory,
+);
 
 routes.get(
     '/categories',

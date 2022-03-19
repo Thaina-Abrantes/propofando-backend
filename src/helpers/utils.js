@@ -57,6 +57,13 @@ function clearUserObject(user) {
   return user;
 }
 
+function clearCategoryObject(category) {
+  delete category.createdAt;
+  delete category.updatedAt;
+  
+  return category;
+}
+
 async function verifyDuplicatedCategory(name) {
   let error = err;
 
@@ -71,6 +78,7 @@ async function verifyDuplicatedCategory(name) {
 module.exports = {
   verifyDuplicatedEmail,
   clearUserObject,
+  clearCategoryObject,
   passwordEdit,
   verifyDuplicatedEmailWithoutMe,
   verifyDuplicatedCategory

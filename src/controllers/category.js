@@ -2,7 +2,7 @@ const { CategoryRepository } = require("../repositories/CategoryRepository");
 
 const categoryRepository = new CategoryRepository()
 
-const { verifyDuplicatedCategory } = require("../helpers/utils");
+const { verifyDuplicatedCategory, clearCategoryObject } = require("../helpers/utils");
 
 async function createCategory(request, response) {
     const { name } = request.body;
@@ -24,4 +24,18 @@ async function listCategories(_, response) {
     return response.status(201).json(categories);
 }
 
-module.exports = { listCategories, createCategory }
+async function getCategory(request, response) {
+    const { id } = request.params;
+
+    const category = await categoryRepository.findOneBy({ id });
+
+    if (!category) {
+        return response.status(404).json({ message: "Categoria não encontrada." });
+    }
+
+    const cleanedCategory = clearCategoryObject(category);
+
+    return response.status(201).json(cleanedCategory);
+}
+
+module.exports = { createCategory, listCategories, getCategory }
