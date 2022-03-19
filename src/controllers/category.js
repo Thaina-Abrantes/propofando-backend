@@ -56,4 +56,29 @@ async function deleteCategory(request, response) {
     return response.status(200).json({ message: 'Categoria deletada com sucesso.' });
 }
 
-module.exports = { createCategory, listCategories, getCategory, deleteCategory }
+async function updateCategory(request, response) {
+    const { id } = request.params;
+    const { name } = request.body;
+
+    const registeredCategory = await verifyDuplicatedCategory(name);
+
+    if (!registeredCategory.success) {
+        return response.status(400).json({ message: registeredCategory.message });
+    }
+    
+    const category = await categoryRepository.findOneBy({ id });
+
+    if (!category) {
+        return response.status(404).json({ message: "Categoria não encontrada." });
+    }
+
+    const updatedCategory = await categoryRepository.update({ id, name });
+
+    if (!updatedCategory) {
+        return response.status(400).json({ message: "Erro ao atualizar categoria." });
+    }
+
+    return response.status(201).json({ message: 'Categoria atualizada com sucesso.' });
+}
+
+module.exports = { createCategory, listCategories, getCategory, deleteCategory, updateCategory }

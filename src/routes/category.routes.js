@@ -4,7 +4,8 @@ const {
     createCategory,
     listCategories,
     getCategory,
-    deleteCategory
+    deleteCategory,
+    updateCategory
  } = require('../controllers/category');
 
 const { validateBody, validateParams } = require('../middlewares/validateRequest');
@@ -44,6 +45,15 @@ routes.delete(
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
     deleteCategory,
+);
+
+routes.patch(
+    '/categories/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
+    validateBody(createCategorySchema),
+    updateCategory,
 );
 
 module.exports = routes;
