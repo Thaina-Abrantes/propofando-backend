@@ -112,7 +112,12 @@ async function updateUser(request, response) {
 async function passwordResetEmail(request, response) {
     const { email } = request.body;
 
-    const user = await userRepository.findOneBy({ email, userType: 'student' });
+    const user = await userRepository.findOneBy({
+        email,
+        userType: 'student',
+        active: true, 
+        deleted:false
+    });
   
     if (!user) {
         return response.status(404).json({
