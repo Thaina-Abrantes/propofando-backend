@@ -21,7 +21,7 @@ async function createCategory(request, response) {
 async function listCategories(_, response) {
     const categories = await categoryRepository.findAll();
 
-    return response.status(201).json(categories);
+    return response.status(200).json(categories);
 }
 
 async function getCategory(request, response) {
@@ -35,7 +35,7 @@ async function getCategory(request, response) {
 
     const cleanedCategory = clearCategoryObject(category);
 
-    return response.status(201).json(cleanedCategory);
+    return response.status(200).json(cleanedCategory);
 }
 
 async function deleteCategory(request, response) {
@@ -78,7 +78,7 @@ async function updateCategory(request, response) {
         return response.status(400).json({ message: "Erro ao atualizar categoria." });
     }
 
-    return response.status(201).json({ message: 'Categoria atualizada com sucesso.' });
+    return response.status(200).json({ message: 'Categoria atualizada com sucesso.' });
 }
 
 module.exports = { createCategory, listCategories, getCategory, deleteCategory, updateCategory }
