@@ -172,29 +172,37 @@ async function updatePassword(request, response) {
     
     const registeredToken = await recoveryRepository.findOneBy({ token });
   
-    if (!registeredToken) {
-        return response.status(404).json({
+    const tokenExpired = await checkIsValidDate(new Date(), registeredToken?.expiredAt);
+  
+    if (!registeredToken || tokenExpired) {
+        return response.status(400).json({
             message: 'Ação inválida. Solicite novamente uma nova senha.'
         });
     }
   
-    const tokenExpired = await checkIsValidDate(new Date(), registeredToken.expiredAt);
-  
-    if (tokenExpired) {
-        return response.status(400).json({
-            message: 'Solicitação expirada. Solicite novamente uma nova senha.'
-        });
-    }
-  
     const encryptedPassword = await encryptPassword(password);
+
+    const transaction = await generateTransaction();
+
+    const { id, userId } = registeredToken;
   
-    const updatedPassword = await userRepository.update({
-        id: registeredToken.userId, password: encryptedPassword
-    });
+    const updatedPassword = await userRepository
+        .withTransaction(transaction)
+        .update({id: userId, password: encryptedPassword});
   
     if (!updatedPassword) {
       return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
     }
+
+    const deleteResetToken = await recoveryRepository
+        .withTransaction(transaction)
+        .delete(id);
+   
+    if (!deleteResetToken) {
+        return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
+    }
+
+    transaction.commit();
   
     return response.status(200).json({message: 'Senha atualizada!'});
   }
