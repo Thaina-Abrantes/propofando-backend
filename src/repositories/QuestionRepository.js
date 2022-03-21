@@ -3,10 +3,10 @@ const knex = require("knex")(knexConfig)
 
 const { BaseRepository } = require("@cubos/knex-repository");
 
-class QuestionsRepository extends BaseRepository {
+class QuestionRepository extends BaseRepository {
     constructor() {
         super(knex, "questions");
     }
 }
 
-module.exports = { QuestionsRepository };
+module.exports = { QuestionRepository };
