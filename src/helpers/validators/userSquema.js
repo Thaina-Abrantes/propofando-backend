@@ -20,7 +20,32 @@ const validateUuidSchema = yup.object().shape({
     .required(),
 });
 
+const validateEmailSchema = yup.object().shape({
+  email: yup.string()
+    .email()
+    .required(),
+});
+
+const validateUpdatePasswordSquema = yup.object().shape({
+  password: yup.string()
+    .required(),
+
+  passwordConfirmation: yup.string()
+    .required()
+    .oneOf([yup.ref('password'), null], 'Certifique-se de que as senhas são iguais.'),
+});
+
+const validateTokenSquema = yup.object().shape({
+  token: yup.string()
+    .uuid()
+    .required()
+})
+
 module.exports = {
   createUserSchema,
   validateUuidSchema,
-};
+  validateEmailSchema,
+  validateUpdatePasswordSquema,
+  validateTokenSquema,
+}
+

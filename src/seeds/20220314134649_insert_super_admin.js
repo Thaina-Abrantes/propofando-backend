@@ -13,7 +13,7 @@ exports.seed = async function (knex) {
     name: process.env.SUPER_ADMIN_NAME,
     email: process.env.SUPER_ADMIN_EMAIL,
     password: encryptedPassword,
-    userType: process.env.SUPER_ADMIN_USERTYPE, 
+    userType: 'super admin', 
   };
 
   const { name, email, password, userType } = superAdmin;

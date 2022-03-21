@@ -5,15 +5,28 @@ const {
     listUsers, 
     createUser,
     deleteUser,
-    updateUser
+    updateUser,
+    passwordResetEmail,
+    updatePassword,
  } = require('../controllers/user');
 
-const { validateBody, validateParams } = require('../middlewares/validateRequest');
+const { 
+    validateBody,
+    validateParams,
+    validateQuery 
+} = require('../middlewares/validateRequest');
+
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-const { createUserSchema, validateUuidSchema } = require('../helpers/validators/userSquema');
-
+const { 
+    createUserSchema,
+    validateUuidSchema,
+    validateEmailSchema,
+    validateTokenSquema,
+    validateUpdatePasswordSquema,
+} = require('../helpers/validators/userSquema');
+ 
 const routes = Router();
 
 routes.get(
@@ -54,6 +67,19 @@ routes.patch(
     validateParams(validateUuidSchema),
     validateBody(createUserSchema),
     updateUser,
+);
+
+routes.post(
+    '/users/recovery-password', 
+    validateBody(validateEmailSchema),
+    passwordResetEmail,
+);
+
+routes.post(
+    '/users/update-password', 
+    validateQuery(validateTokenSquema),
+    validateBody(validateUpdatePasswordSquema),
+    updatePassword,
 );
 
 module.exports = routes;
