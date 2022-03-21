@@ -1,9 +1,22 @@
-const { UserRepository } = require("../repositories/UserRepository")
+const { UserRepository } = require('../repositories/UserRepository');
+const { RecoveryRepository} = require('../repositories/RecoveryRepository');
 
-const userRepository = new UserRepository()
+const userRepository = new UserRepository();
+const recoveryRepository = new RecoveryRepository();
 
-const { encryptPassword } = require("../helpers/handlePassword");
-const { verifyDuplicatedEmail, passwordEdit, clearUserObject, verifyDuplicatedEmailWithoutMe } = require("../helpers/utils");
+const { 
+    verifyDuplicatedEmail,
+    passwordEdit,
+    clearUserObject,
+    verifyDuplicatedEmailWithoutMe,
+} = require('../helpers/utils');
+
+const { encryptPassword } = require('../helpers/handlePassword');
+const { addTime, checkIsValidDate } = require('../helpers/handleDate');
+const { generateUuid } = require('../helpers/handleUuid');
+const { generateTransaction } = require('../helpers/handleTransaction');
+
+const { sendMail } = require('../services/sendMail');
 
 async function getUser(request, response) {
     const { id } = request.params;
@@ -11,7 +24,7 @@ async function getUser(request, response) {
     const user = await userRepository.findOneBy({ id });
 
     if (!user) {
-        return response.status(404).json({ message: "Usuário não encontrado." });
+        return response.status(404).json({ message: 'Usuário não encontrado.' });
     }
 
     const cleanedUser = clearUserObject(user);
@@ -55,13 +68,13 @@ async function deleteUser(request, response) {
     const existedUser = await userRepository.get(id);
 
     if (!existedUser) {
-        return response.status(404).json({ message: "Usuário não encontrado." });
+        return response.status(404).json({ message: 'Usuário não encontrado.' });
     }
 
     const deletedUser = await userRepository.update({ id, active: 'false', deleted: 'true' });
 
     if (!deletedUser) {
-        return response.status(400).json({ message: "Erro ao deletar usuário." });
+        return response.status(400).json({ message: 'Erro ao deletar usuário.' });
     }
 
     return response.status(200).json({ message: 'Usuário deletado com sucesso.' });
@@ -74,7 +87,7 @@ async function updateUser(request, response) {
     const existedUser = await userRepository.findOneBy({ id, deleted: false });
 
     if (!existedUser) {
-        return response.status(404).json({ message: "Usuário não encontrado." });
+        return response.status(404).json({ message: 'Usuário não encontrado.' });
     }
 
     const registeredEmail = await verifyDuplicatedEmailWithoutMe(id, email);
@@ -90,10 +103,121 @@ async function updateUser(request, response) {
     const updatedUser = await userRepository.update({ id, name, email, password: encryptedPassword });
 
     if (!updatedUser) {
-        return response.status(400).json({ message: "Erro ao atualizar usuário." });
+        return response.status(400).json({ message: 'Erro ao atualizar usuário.' });
     }
 
     return response.status(201).json({ message: 'Usuário atualizado com sucesso.' });
 }
 
-module.exports = { getUser, listUsers, createUser, deleteUser, updateUser }
+async function passwordResetEmail(request, response) {
+    const { email } = request.body;
+
+    const user = await userRepository.findOneBy({
+        email,
+        userType: 'student',
+        active: true, 
+        deleted:false
+    });
+  
+    if (!user) {
+        return response.status(404).json({
+            message: `Não foi possível enviar um email para ${email}. Favor verifique se o email informado está correto.`
+        });
+    }
+    
+    const creationDate = new Date();
+    const resetToken = generateUuid(user.email);
+    const expiredAt = addTime(creationDate, { hours: 1 });
+
+    const transaction = await generateTransaction();
+
+    const insertedInfo = await recoveryRepository.withTransaction(transaction).insert({
+        token: resetToken, 
+        expiredAt,
+        userId: user.id,
+    });
+  
+    if (!insertedInfo) {
+        return response.status(400).json({
+            message: `Ops! Não foi possível enviar um email para ${email}.`
+        });
+    }
+  
+    const mailOptions = {
+        from: 'Propofando <não-responda@propofando.com>',
+        to: email,
+        subject: 'Redefinição de senha',
+        template: 'recovery-password/index',
+        context: {
+            user: user.name,
+            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}?token=${resetToken}`,
+            emailContact: process.env.EMAIL_PROPOFANDO
+        },
+    };
+  
+    const emailSent = await sendMail(mailOptions);
+  
+    if (!emailSent) {
+      return response.status(400).json({
+          message: `Não foi possível enviar um email para ${email}. Verifique o email fornecido.`
+      });
+    }
+
+    transaction.commit();
+  
+    return response.status(200).json({
+        message: `O email foi enviado para ${email} com um link para resetar sua senha.`,
+    });
+
+}   
+
+async function updatePassword(request, response) {
+    const { token } = request.query;
+    const { password } = request.body;
+    
+    const registeredToken = await recoveryRepository.findOneBy({ token });
+  
+    const tokenExpired = await checkIsValidDate(new Date(), registeredToken?.expiredAt);
+  
+    if (!registeredToken || tokenExpired) {
+        return response.status(400).json({
+            message: 'Ação inválida. Solicite novamente uma nova senha.'
+        });
+    }
+  
+    const encryptedPassword = await encryptPassword(password);
+
+    const transaction = await generateTransaction();
+
+    const { id, userId } = registeredToken;
+  
+    const updatedPassword = await userRepository
+        .withTransaction(transaction)
+        .update({id: userId, password: encryptedPassword});
+  
+    if (!updatedPassword) {
+      return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
+    }
+
+    const deleteResetToken = await recoveryRepository
+        .withTransaction(transaction)
+        .delete(id);
+   
+    if (!deleteResetToken) {
+        return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
+    }
+
+    transaction.commit();
+  
+    return response.status(200).json({message: 'Senha atualizada!'});
+  }
+
+module.exports = { 
+    getUser,
+    listUsers,
+    createUser,
+    deleteUser,
+    updateUser,
+    passwordResetEmail,
+    updatePassword,
+}
