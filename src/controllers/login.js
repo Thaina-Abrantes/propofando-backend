@@ -15,6 +15,12 @@ async function login(request, response) {
     return response.status(400).json({ message: 'Email e/ou senha informados são inválidos.' });
   }
 
+  const { active, deleted } = registeredUser;
+
+  if (!active || deleted ) {
+    return response.status(401).json({ message: 'Contate o administrador do sistema para reativar sua conta.' });
+  }
+
   const verifiedPassword = await comparePasswords(password, registeredUser.password);
 
   if (!verifiedPassword) {
