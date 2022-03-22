@@ -13,7 +13,7 @@ class QuestionRepository extends BaseRepository {
             .leftJoin('alternatives as a', 'a.questionId', 'q.id')
             .select(
                 'q.*',
-                knex.raw('JSON_AGG((a.description, a.correct)) as alternatives'),
+                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .where('q.id', id)
             .groupBy('q.id')
