@@ -80,8 +80,42 @@ async function deleteQuestion(request, response) {
     return response.status(200).json({ message: 'Questão deletada com sucesso.' });
 }
 
+async function updateQuestion(request, response){
+    const { id } = request.params;
+    const { 
+        title,
+        description, 
+        category,
+        image,
+        explanationVideo,
+        explanationText, 
+        alternatives,      
+    } = request.body;
+    
+    const question = await questionRepository.get(id);
+
+    if (!question) {
+        return response.status(404).json({ message: 'Questão não encontrada.' });
+    }
+
+    const transaction = await generateTransaction();
+
+    const updatedQuestion = await questionRepository
+        .withTransaction(transaction)
+        .update({id, title, description, category, image, explanationVideo, explanationText});
+
+    if (!updatedQuestion) {
+        return response.status(400).json({ message: 'Erro ao atualizar questão.' });
+    }
+
+    transaction.commit();
+
+    return response.status(200).json({ message: 'Questão atualizada com sucesso.' });
+}
+
 module.exports = {
     getQuestion,
     createQuestion,
     deleteQuestion,
+    updateQuestion,
 }

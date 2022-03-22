@@ -3,7 +3,8 @@ const { Router } = require('express');
 const { 
     getQuestion, 
     createQuestion, 
-    deleteQuestion 
+    deleteQuestion, 
+    updateQuestion
 } = require('../controllers/question');
 
 const { 
@@ -37,6 +38,13 @@ routes.delete(
     authentication,
     validateAccessPermission(['super admin']),
     deleteQuestion,
+);
+
+routes.patch(
+    '/questions/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    updateQuestion,
 );
 
 module.exports = routes;
