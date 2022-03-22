@@ -6,6 +6,18 @@ const alternativeRepository = new AlternativeRepository();
 
 const { generateTransaction } = require('../helpers/handleTransaction');
 
+async function getQuestion(request, response) {
+    const { id } = request.params;
+
+    const question = await questionRepository.getQuestion(id);
+
+    if (!question) {
+        return response.status(404).json({ message: 'Questão não encontrada.' });
+    }
+
+    return response.status(200).json(question);
+}
+
 async function createQuestion(request, response) {
     const { 
         title,
@@ -64,11 +76,12 @@ async function deleteQuestion(request, response) {
     }
 
     transaction.commit();
-    
+
     return response.status(200).json({ message: 'Questão deletada com sucesso.' });
 }
 
 module.exports = {
+    getQuestion,
     createQuestion,
     deleteQuestion,
 }

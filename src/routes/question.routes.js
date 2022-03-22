@@ -1,6 +1,10 @@
 const { Router } = require('express');
 
-const { createQuestion, deleteQuestion } = require('../controllers/question');
+const { 
+    getQuestion, 
+    createQuestion, 
+    deleteQuestion 
+} = require('../controllers/question');
 
 const { 
     validateBody,
@@ -14,6 +18,12 @@ const validateAccessPermission = require('../middlewares/validateAccessPermissio
 
 const routes = Router();
 
+routes.get(
+    '/questions/:id',
+    authentication,
+    validateAccessPermission(['super admin', 'student']),
+    getQuestion,
+);
 
 routes.post(
     '/questions',
