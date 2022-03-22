@@ -6,14 +6,13 @@ const {
     createUser,
     deleteUser,
     updateUser,
-    passwordResetEmail,
-    updatePassword,
+    recoveryPassword,
+    redefinePassword,
  } = require('../controllers/user');
 
 const { 
     validateBody,
     validateParams,
-    validateQuery 
 } = require('../middlewares/validateRequest');
 
 const authentication = require('../middlewares/authentication');
@@ -70,16 +69,16 @@ routes.patch(
 );
 
 routes.post(
-    '/users/recovery-password', 
+    '/users/recovery', 
     validateBody(validateEmailSchema),
-    passwordResetEmail,
+    recoveryPassword,
 );
 
 routes.post(
-    '/users/update-password', 
-    validateQuery(validateTokenSquema),
+    '/users/redefine-password/:token', 
+    validateParams(validateTokenSquema),
     validateBody(validateUpdatePasswordSquema),
-    updatePassword,
+    redefinePassword,
 );
 
 module.exports = routes;

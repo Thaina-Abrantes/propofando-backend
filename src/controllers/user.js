@@ -109,7 +109,7 @@ async function updateUser(request, response) {
     return response.status(201).json({ message: 'Usuário atualizado com sucesso.' });
 }
 
-async function passwordResetEmail(request, response) {
+async function recoveryPassword(request, response) {
     const { email } = request.body;
 
     const user = await userRepository.findOneBy({
@@ -171,8 +171,8 @@ async function passwordResetEmail(request, response) {
 
 }   
 
-async function updatePassword(request, response) {
-    const { token } = request.query;
+async function redefinePassword(request, response) {
+    const { token } = request.params;
     const { password } = request.body;
     
     const registeredToken = await recoveryRepository.findOneBy({ token });
@@ -218,6 +218,6 @@ module.exports = {
     createUser,
     deleteUser,
     updateUser,
-    passwordResetEmail,
-    updatePassword,
+    recoveryPassword,
+    redefinePassword,
 }
