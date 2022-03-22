@@ -69,7 +69,7 @@ routes.patch(
 );
 
 routes.post(
-    '/users/recovery', 
+    '/users/recovery-password', 
     validateBody(validateEmailSchema),
     recoveryPassword,
 );
