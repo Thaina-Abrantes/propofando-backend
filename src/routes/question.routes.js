@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-const { createQuestion } = require('../controllers/question');
+const { createQuestion, deleteQuestion } = require('../controllers/question');
 
 const { 
     validateBody,
@@ -20,6 +20,13 @@ routes.post(
     authentication,
     validateAccessPermission(['super admin']),
     createQuestion,
+);
+
+routes.delete(
+    '/questions/:id',
+    authentication,
+    validateAccessPermission(['super admin']),
+    deleteQuestion,
 );
 
 module.exports = routes;

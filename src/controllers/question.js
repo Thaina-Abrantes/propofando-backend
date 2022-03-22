@@ -40,6 +40,35 @@ async function createQuestion(request, response) {
     return response.status(201).json({ message: 'Questão cadastrada com sucesso.' });
 }
 
+async function deleteQuestion(request, response) {
+    const { id } = request.params;
+
+    const existedQuestion = await questionRepository.get(id);
+
+    if (!existedQuestion) {
+        return response.status(404).json({ message: 'Questão não encontrada.' });
+    }
+
+    const transaction = await generateTransaction();
+
+    const deletedAlternatives = await alternativeRepository
+        .withTransaction(transaction)
+        .deleteBy({questionId: id});
+
+    const deletedQuestion = await questionRepository
+        .withTransaction(transaction)
+        .delete(id);
+
+    if (!deletedAlternatives || !deletedQuestion) {
+        return response.status(400).json({ message: 'Erro ao deletar questão' });
+    }
+
+    transaction.commit();
+    
+    return response.status(200).json({ message: 'Questão deletada com sucesso.' });
+}
+
 module.exports = {
     createQuestion,
+    deleteQuestion,
 }
