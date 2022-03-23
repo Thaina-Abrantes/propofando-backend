@@ -18,10 +18,22 @@ async function getQuestion(request, response) {
     return response.status(200).json(question[0]);
 }
 
-async function listQuestions(_, response) {
-    const questions = await questionRepository.getQuestions();
+async function listQuestions(request, response) {
+    const { page, size } = request.query;
 
-    return response.status(200).json(questions);
+    const questions = await questionRepository.getQuestions(page, size);
+
+    const totalItems = questions.totalItems;
+    const totalPages = Math.ceil(questions.totalPages) || 0;
+    const currentPage = questions.currentPage || 0;
+
+
+    return response.status(200).json({
+        totalItems,
+        questions, 
+        totalPages, 
+        currentPage
+    });
 }
 
 async function createQuestion(request, response) {
