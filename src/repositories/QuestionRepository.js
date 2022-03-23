@@ -12,7 +12,13 @@ class QuestionRepository extends BaseRepository {
         const question = await knex('questions as q')
             .leftJoin('alternatives as a', 'a.questionId', 'q.id')
             .select(
-                'q.*',
+                'q.id',
+                'q.title',
+                'q.description',
+                'q.category',
+                'q.image',
+                'q.explanationVideo',
+                'q.explanationText',
                 knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .where('q.id', id)
@@ -23,19 +29,28 @@ class QuestionRepository extends BaseRepository {
     }
 
     async getQuestions(pageNumber, size) {
+        pageNumber = pageNumber || 1;
+        size = size || 6;
+        
         const rowCount = await knex('questions as q')
             .count('*');
 
         const { count } = rowCount[0];
 
-        const numberOfPages = count / size;
+        const numberOfPages = Math.ceil(count / size);
 
         const page = (pageNumber - 1) * size;
 
         const questions = await knex('questions as q')
             .leftJoin('alternatives as a', 'a.questionId', 'q.id')
             .select(
-                'q.*',
+                'q.id',
+                'q.title',
+                'q.description',
+                'q.category',
+                'q.image',
+                'q.explanationVideo',
+                'q.explanationText',
                 knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .groupBy('q.id')
@@ -43,9 +58,9 @@ class QuestionRepository extends BaseRepository {
             .offset(page)
             .returning('*');
     
-        questions.currentPage = parseInt(pageNumber, 10);
         questions.totalItems = count;
         questions.totalPages = numberOfPages >= 1 ? numberOfPages : 1;
+        questions.currentPage = parseInt(pageNumber, 10);
 
         return questions;
     }

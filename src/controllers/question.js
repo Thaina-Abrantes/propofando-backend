@@ -24,8 +24,8 @@ async function listQuestions(request, response) {
     const questions = await questionRepository.getQuestions(page, size);
 
     const totalItems = questions.totalItems;
-    const totalPages = Math.ceil(questions.totalPages) || 0;
-    const currentPage = questions.currentPage || 0;
+    const totalPages = questions.totalPages;
+    const currentPage = questions.currentPage;
 
 
     return response.status(200).json({
