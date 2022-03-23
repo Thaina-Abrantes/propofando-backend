@@ -15,7 +15,7 @@ async function getQuestion(request, response) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
-    return response.status(200).json(question);
+    return response.status(200).json(question[0]);
 }
 
 async function createQuestion(request, response) {
