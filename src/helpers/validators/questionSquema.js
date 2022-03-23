@@ -23,11 +23,30 @@ const createQuestionSchema = yup.object().shape({
       correct: yup.boolean()
     }).required()
   ).required(),
-
 });
 
+const updateQuestionSchema = yup.object().shape({
+  title: yup.string(),
+
+  description: yup.string()
+    .max(1620),
+
+  image: yup.string(),
+
+  explanationVideo: yup.string(),
+  
+  explanationText: yup.string().max(1620),
+
+  alternatives: yup.array().of(
+    yup.object().shape({
+      description : yup.string(), 
+      correct: yup.boolean()
+    })
+  ),
+});
 
 module.exports = {
   createQuestionSchema,
+  updateQuestionSchema,
 }
 

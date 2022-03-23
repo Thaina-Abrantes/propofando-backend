@@ -18,7 +18,11 @@ const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
 const { validateUuidSchema } = require('../helpers/validators/userSquema');
-const { createQuestionSchema } = require('../helpers/validators/questionSquema');
+
+const { 
+    createQuestionSchema, 
+    updateQuestionSchema
+} = require('../helpers/validators/questionSquema');
 
 
 const routes = Router();
@@ -59,6 +63,7 @@ routes.patch(
     authentication,
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
+    validateBody(updateQuestionSchema),
     updateQuestion,
 );
 
