@@ -11,7 +11,7 @@ async function getQuestion(request, response) {
 
     const question = await questionRepository.getQuestion(id);
 
-    if (!question) {
+    if (!question.length) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
@@ -26,7 +26,6 @@ async function listQuestions(request, response) {
     const totalItems = questions.totalItems;
     const totalPages = questions.totalPages;
     const currentPage = questions.currentPage;
-
 
     return response.status(200).json({
         totalItems,
@@ -137,7 +136,7 @@ async function updateQuestion(request, response){
         
         if (!existedAlternative) {
             return response.status(404).json({
-                    message: `Alternativa não encontrada com o id: ${id}` 
+                    message: `Alternativa não encontrada com o id: ${alternativeId}` 
                 });
         }
 

@@ -17,13 +17,16 @@ const {
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
+const { validateUuidSchema } = require('../helpers/validators/userSquema');
+
 
 const routes = Router();
 
 routes.get(
     '/questions/:id',
     authentication,
-    validateAccessPermission(['super admin', 'student']),
+    validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
     getQuestion,
 );
 
@@ -45,6 +48,7 @@ routes.delete(
     '/questions/:id',
     authentication,
     validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
     deleteQuestion,
 );
 
@@ -52,6 +56,7 @@ routes.patch(
     '/questions/:id',
     authentication,
     validateAccessPermission(['super admin']),
+    validateParams(validateUuidSchema),
     updateQuestion,
 );
 
