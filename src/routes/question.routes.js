@@ -18,6 +18,7 @@ const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
 const { validateUuidSchema } = require('../helpers/validators/userSquema');
+const { createQuestionSchema } = require('../helpers/validators/questionSquema');
 
 
 const routes = Router();
@@ -41,6 +42,7 @@ routes.post(
     '/questions',
     authentication,
     validateAccessPermission(['super admin']),
+    validateBody(createQuestionSchema),
     createQuestion,
 );
 
