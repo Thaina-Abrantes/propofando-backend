@@ -2,6 +2,7 @@ const { Router } = require('express');
 
 const { 
     getQuestion, 
+    listQuestions,
     createQuestion, 
     deleteQuestion, 
     updateQuestion
@@ -24,6 +25,13 @@ routes.get(
     authentication,
     validateAccessPermission(['super admin', 'student']),
     getQuestion,
+);
+
+routes.get(
+    '/questions',
+    authentication,
+    validateAccessPermission(['super admin']),
+    listQuestions,
 );
 
 routes.post(

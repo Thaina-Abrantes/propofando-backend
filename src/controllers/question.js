@@ -18,6 +18,12 @@ async function getQuestion(request, response) {
     return response.status(200).json(question[0]);
 }
 
+async function listQuestions(_, response) {
+    const questions = await questionRepository.getQuestions();
+
+    return response.status(200).json(questions);
+}
+
 async function createQuestion(request, response) {
     const { 
         title,
@@ -139,6 +145,7 @@ async function updateQuestion(request, response){
 
 module.exports = {
     getQuestion,
+    listQuestions,
     createQuestion,
     deleteQuestion,
     updateQuestion,
