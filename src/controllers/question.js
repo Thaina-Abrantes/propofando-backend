@@ -108,6 +108,30 @@ async function updateQuestion(request, response){
         return response.status(400).json({ message: 'Erro ao atualizar questão.' });
     }
 
+    for (const alternative of alternatives) {
+        const { 
+            id: alternativeId,
+            description: alternativeDescription, 
+            correct
+        } = alternative;
+
+        const existedAlternative = await alternativeRepository.get(alternativeId); 
+        
+        if (!existedAlternative) {
+            return response.status(404).json({
+                    message: `Alternativa não encontrada com o id: ${id}` 
+                });
+        }
+
+        const updatedAlternative = await alternativeRepository
+        .withTransaction(transaction)
+        .update({id: alternativeId, description: alternativeDescription, correct}); 
+
+        if (!updatedAlternative) {
+            return response.status(400).json({ message: 'Erro ao atualizar alternativa da questão.' });
+        }
+    }
+
     transaction.commit();
 
     return response.status(200).json({ message: 'Questão atualizada com sucesso.' });
