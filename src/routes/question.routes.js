@@ -17,7 +17,10 @@ const {
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-const { validateUuidSchema } = require('../helpers/validators/userSquema');
+const { 
+    validateUuidSchema,
+    paginatedSchema 
+} = require('../helpers/validators/genericSchema');
 
 const { 
     createQuestionSchema, 
@@ -39,6 +42,7 @@ routes.get(
     '/questions',
     authentication,
     validateAccessPermission(['super admin']),
+    validateQuery(paginatedSchema),
     listQuestions,
 );
 
