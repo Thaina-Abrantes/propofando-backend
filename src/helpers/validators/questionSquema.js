@@ -5,6 +5,7 @@ setLocale(pt);
 
 const createQuestionSchema = yup.object().shape({
   title: yup.string()
+    .max(200)
     .required(),
 
   description: yup.string()
@@ -19,7 +20,8 @@ const createQuestionSchema = yup.object().shape({
 
   explanationVideo: yup.string(),
   
-  explanationText: yup.string().max(1620),
+  explanationText: yup.string()
+    .max(1620),
 
   alternatives: yup.array().of(
     yup.object().shape({
@@ -30,7 +32,8 @@ const createQuestionSchema = yup.object().shape({
 });
 
 const updateQuestionSchema = yup.object().shape({
-  title: yup.string(),
+  title: yup.string()
+    .max(200),
 
   description: yup.string()
     .max(1620),

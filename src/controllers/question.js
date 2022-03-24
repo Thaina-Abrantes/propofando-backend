@@ -140,17 +140,17 @@ async function updateQuestion(request, response){
             correct
         } = alternative;
 
-        const existedAlternative = await alternativeRepository.get(alternativeId); 
+        const existedAlternative = await alternativeRepository.findOneBy({id: alternativeId, questionId: id}); 
         
         if (!existedAlternative) {
             return response.status(404).json({
-                    message: `Alternativa não encontrada com o id: ${alternativeId}` 
+                    message: `Alternativa não encontrada para esta questão com o id: ${alternativeId}` 
             });
         }
 
         const updatedAlternative = await alternativeRepository
-        .withTransaction(transaction)
-        .update({id: alternativeId, description: alternativeDescription, correct}); 
+            .withTransaction(transaction)
+            .update({id: alternativeId, description: alternativeDescription, correct}); 
 
         if (!updatedAlternative) {
             return response.status(400).json({ message: 'Erro ao atualizar alternativa da questão.' });
