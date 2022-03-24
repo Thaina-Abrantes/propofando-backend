@@ -21,9 +21,9 @@ async function getQuestion(request, response) {
 }
 
 async function listQuestions(request, response) {
-    const { page, size } = request.query;
+    const { page, size, category } = request.query;
 
-    const questions = await questionRepository.getQuestions(page, size);
+    const questions = await questionRepository.getQuestions(page, size, category);
 
     const totalItems = questions.totalItems;
     const totalPages = questions.totalPages;

@@ -28,11 +28,16 @@ class QuestionRepository extends BaseRepository {
         return question;
     }
 
-    async getQuestions(pageNumber, size) {
+    async getQuestions(pageNumber, size, category) {
         pageNumber = pageNumber || 1;
         size = size || 6;
 
         const rowCount = await knex('questions as q')
+            .where((builder) => {
+                if (category) {
+                    builder.where('q.categoryId', category);
+                }
+            })
             .count('*');
 
         const { count } = rowCount[0];
@@ -53,6 +58,11 @@ class QuestionRepository extends BaseRepository {
                 'q.explanationText',
                 knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
+            .where((builder) => {
+                if (category) {
+                  builder.where('q.categoryId', category);
+                }
+            })
             .groupBy('q.id')
             .limit(size)
             .offset(page)
