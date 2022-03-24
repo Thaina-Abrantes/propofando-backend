@@ -19,9 +19,32 @@ async function createCategory(request, response) {
 }
 
 async function listCategories(_, response) {
-    const categories = await categoryRepository.findAll();
+    const allCategories = await categoryRepository.findAll();
 
-    return response.status(200).json(categories);
+    const cleanedCategories = [];
+
+    for (const category of allCategories) {
+        cleanedCategories.push(clearCategoryObject(category));
+    }
+
+    return response.status(200).json(cleanedCategories);
+}
+
+async function listCategoriesPaginated(request, response) {
+    const { page, size } = request.query;
+
+    const categories = await categoryRepository.getCategories(page, size);
+
+    const totalItems = categories.totalItems;
+    const totalPages = categories.totalPages;
+    const currentPage = categories.currentPage;
+
+    return response.status(200).json({
+        totalItems,
+        categories, 
+        totalPages, 
+        currentPage
+    });
 }
 
 async function getCategory(request, response) {
@@ -81,4 +104,11 @@ async function updateCategory(request, response) {
     return response.status(200).json({ message: 'Categoria atualizada com sucesso.' });
 }
 
-module.exports = { createCategory, listCategories, getCategory, deleteCategory, updateCategory }
+module.exports = { 
+    createCategory, 
+    listCategories, 
+    listCategoriesPaginated,
+    getCategory, 
+    deleteCategory, 
+    updateCategory
+}
