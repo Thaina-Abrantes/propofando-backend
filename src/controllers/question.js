@@ -48,6 +48,12 @@ async function createQuestion(request, response) {
         alternatives,      
     } = request.body;
 
+    const existedCategory = await categoryRepository.get(categoryId);
+
+    if (categoryId && !existedCategory) {
+        return response.status(404).json({ message: 'Categoria não encontrada.' });
+    }
+
     const transaction = await generateTransaction();
 
     const registeredQuestion = await questionRepository
