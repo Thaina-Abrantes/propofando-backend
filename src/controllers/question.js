@@ -1,8 +1,10 @@
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { AlternativeRepository } = require('../repositories/AlternativeRepository');
+const { CategoryRepository } = require('../repositories/CategoryRepository');
 
 const questionRepository = new QuestionRepository();
 const alternativeRepository = new AlternativeRepository();
+const categoryRepository = new CategoryRepository();
 
 const { generateTransaction } = require('../helpers/handleTransaction');
 
@@ -39,7 +41,7 @@ async function createQuestion(request, response) {
     const { 
         title,
         description, 
-        category,
+        categoryId,
         image,
         explanationVideo,
         explanationText, 
@@ -50,7 +52,7 @@ async function createQuestion(request, response) {
 
     const registeredQuestion = await questionRepository
         .withTransaction(transaction)
-        .insert({ title, description, category, image, explanationVideo, explanationText});
+        .insert({ title, description, categoryId, image, explanationVideo, explanationText});
 
     for (const alternative of alternatives) {
         alternative.questionId = registeredQuestion.id;
@@ -102,24 +104,30 @@ async function updateQuestion(request, response){
     const { 
         title,
         description, 
-        category,
+        categoryId,
         image,
         explanationVideo,
         explanationText, 
         alternatives,      
     } = request.body;
     
-    const question = await questionRepository.get(id);
+    const existedQuestion = await questionRepository.get(id);
 
-    if (!question) {
+    if (!existedQuestion) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
+    }
+
+    const existedCategory = await categoryRepository.get(categoryId);
+
+    if (categoryId && !existedCategory) {
+        return response.status(404).json({ message: 'Categoria não encontrada.' });
     }
 
     const transaction = await generateTransaction();
 
     const updatedQuestion = await questionRepository
         .withTransaction(transaction)
-        .update({id, title, description, category, image, explanationVideo, explanationText});
+        .update({id, title, description, categoryId, image, explanationVideo, explanationText});
 
     if (!updatedQuestion) {
         return response.status(400).json({ message: 'Erro ao atualizar questão.' });
@@ -137,7 +145,7 @@ async function updateQuestion(request, response){
         if (!existedAlternative) {
             return response.status(404).json({
                     message: `Alternativa não encontrada com o id: ${alternativeId}` 
-                });
+            });
         }
 
         const updatedAlternative = await alternativeRepository

@@ -15,7 +15,7 @@ class QuestionRepository extends BaseRepository {
                 'q.id',
                 'q.title',
                 'q.description',
-                'q.category',
+                'q.categoryId',
                 'q.image',
                 'q.explanationVideo',
                 'q.explanationText',
@@ -31,7 +31,7 @@ class QuestionRepository extends BaseRepository {
     async getQuestions(pageNumber, size) {
         pageNumber = pageNumber || 1;
         size = size || 6;
-        
+
         const rowCount = await knex('questions as q')
             .count('*');
 
@@ -47,7 +47,7 @@ class QuestionRepository extends BaseRepository {
                 'q.id',
                 'q.title',
                 'q.description',
-                'q.category',
+                'q.categoryId',
                 'q.image',
                 'q.explanationVideo',
                 'q.explanationText',
