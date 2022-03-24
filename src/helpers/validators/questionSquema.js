@@ -11,6 +11,10 @@ const createQuestionSchema = yup.object().shape({
     .max(1620)
     .required(),
 
+  categoryId: yup.string()
+    .uuid()
+    .required(),
+
   image: yup.string(),
 
   explanationVideo: yup.string(),
@@ -30,6 +34,10 @@ const updateQuestionSchema = yup.object().shape({
 
   description: yup.string()
     .max(1620),
+  
+  categoryId: yup.string()
+    .uuid()
+    .required(),
 
   image: yup.string(),
 
