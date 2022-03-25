@@ -14,12 +14,6 @@ const createUserSchema = yup.object().shape({
   password: yup.string(),
 });
 
-const validateUuidSchema = yup.object().shape({
-  id: yup.string()
-    .uuid()
-    .required(),
-});
-
 const validateEmailSchema = yup.object().shape({
   email: yup.string()
     .email()
@@ -43,7 +37,6 @@ const validateTokenSquema = yup.object().shape({
 
 module.exports = {
   createUserSchema,
-  validateUuidSchema,
   validateEmailSchema,
   validateUpdatePasswordSquema,
   validateTokenSquema,

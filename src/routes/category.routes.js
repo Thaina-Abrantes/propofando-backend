@@ -3,18 +3,27 @@ const { Router } = require('express');
 const { 
     createCategory,
     listCategories,
+    listCategoriesPaginated,
     getCategory,
     deleteCategory,
-    updateCategory
+    updateCategory,
  } = require('../controllers/category');
 
 const { validateBody, validateParams } = require('../middlewares/validateRequest');
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-const { createCategorySchema, validateUuidSchema } = require('../helpers/validators/categorySquema');
+const { createCategorySchema } = require('../helpers/validators/categorySquema');
+const { validateUuidSchema } = require('../helpers/validators/genericSchema');
 
 const routes = Router();
+
+routes.get(
+    '/categories/paginated',
+    authentication,
+    validateAccessPermission(['super admin']),
+    listCategoriesPaginated,
+);
 
 routes.get(
     '/categories/:id',

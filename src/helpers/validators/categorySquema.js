@@ -8,13 +8,6 @@ const createCategorySchema = yup.object().shape({
     .required(),
 });
 
-const validateUuidSchema = yup.object().shape({
-  id: yup.string()
-    .uuid()
-    .required(),
-});
-
 module.exports = {
   createCategorySchema,
-  validateUuidSchema,
 };
