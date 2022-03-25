@@ -23,7 +23,6 @@ class CategoryRepository extends BaseRepository {
         const page = (pageNumber - 1) * size;
 
         const categories = await knex('category as c')
-            .innerJoin('questions as q', 'c.id', 'q.categoryId')
             .select(
                 'c.id',
                 'c.name',

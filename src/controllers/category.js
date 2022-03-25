@@ -1,8 +1,10 @@
-const { CategoryRepository } = require("../repositories/CategoryRepository");
+const { CategoryRepository } = require('../repositories/CategoryRepository');
+const { QuestionRepository } = require('../repositories/QuestionRepository');
 
-const categoryRepository = new CategoryRepository()
+const categoryRepository = new CategoryRepository();
+const questionRepository = new QuestionRepository();
 
-const { verifyDuplicatedCategory, clearCategoryObject } = require("../helpers/utils");
+const { verifyDuplicatedCategory, clearCategoryObject } = require('../helpers/utils');
 
 async function createCategory(request, response) {
     const { name } = request.body;
@@ -35,12 +37,20 @@ async function listCategoriesPaginated(request, response) {
 
     const categories = await categoryRepository.getCategories(page, size);
 
-    const totalItems = categories.totalItems;
+    for(const category of categories) {
+        const { id } = category;
+
+        const questionsAssociateds = await questionRepository.findBy({categoryId: id});
+
+        category.totalQuestions = questionsAssociateds.length;
+    }
+
+    const totalCategories = categories.totalItems;
     const totalPages = categories.totalPages;
     const currentPage = categories.currentPage;
 
     return response.status(200).json({
-        totalItems,
+        totalCategories,
         categories, 
         totalPages, 
         currentPage
