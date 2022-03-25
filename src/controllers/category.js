@@ -1,8 +1,10 @@
-const { CategoryRepository } = require("../repositories/CategoryRepository");
+const { CategoryRepository } = require('../repositories/CategoryRepository');
+const { QuestionRepository } = require('../repositories/QuestionRepository');
 
-const categoryRepository = new CategoryRepository()
+const categoryRepository = new CategoryRepository();
+const questionRepository = new QuestionRepository();
 
-const { verifyDuplicatedCategory, clearCategoryObject } = require("../helpers/utils");
+const { verifyDuplicatedCategory, clearCategoryObject } = require('../helpers/utils');
 
 async function createCategory(request, response) {
     const { name } = request.body;
@@ -19,9 +21,40 @@ async function createCategory(request, response) {
 }
 
 async function listCategories(_, response) {
-    const categories = await categoryRepository.findAll();
+    const allCategories = await categoryRepository.findAll();
 
-    return response.status(200).json(categories);
+    const cleanedCategories = [];
+
+    for (const category of allCategories) {
+        cleanedCategories.push(clearCategoryObject(category));
+    }
+
+    return response.status(200).json(cleanedCategories);
+}
+
+async function listCategoriesPaginated(request, response) {
+    const { page, size } = request.query;
+
+    const categories = await categoryRepository.getCategories(page, size);
+
+    for(const category of categories) {
+        const { id } = category;
+
+        const questionsAssociateds = await questionRepository.findBy({categoryId: id});
+
+        category.totalQuestions = questionsAssociateds.length;
+    }
+
+    const totalCategories = categories.totalItems;
+    const totalPages = categories.totalPages;
+    const currentPage = categories.currentPage;
+
+    return response.status(200).json({
+        totalCategories,
+        categories, 
+        totalPages, 
+        currentPage
+    });
 }
 
 async function getCategory(request, response) {
@@ -81,4 +114,11 @@ async function updateCategory(request, response) {
     return response.status(200).json({ message: 'Categoria atualizada com sucesso.' });
 }
 
-module.exports = { createCategory, listCategories, getCategory, deleteCategory, updateCategory }
+module.exports = { 
+    createCategory, 
+    listCategories, 
+    listCategoriesPaginated,
+    getCategory, 
+    deleteCategory, 
+    updateCategory
+}
