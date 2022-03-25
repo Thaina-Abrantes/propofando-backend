@@ -20,11 +20,12 @@ const validateAccessPermission = require('../middlewares/validateAccessPermissio
 
 const { 
     createUserSchema,
-    validateUuidSchema,
     validateEmailSchema,
     validateTokenSquema,
     validateUpdatePasswordSquema,
 } = require('../helpers/validators/userSquema');
+
+const { validateUuidSchema } = require('../helpers/validators/genericSchema');
  
 const routes = Router();
 
