@@ -10,9 +10,9 @@ const uploadConfig = multer({
   storage: multer.diskStorage({
     destination: uploadFolder,
     filename(req, file, callback) {
-      const filename = `${generateUuid()}`;
+      const fileType = file.mimetype.split('/')[1];
 
-      console.log('file', file);
+      const filename = `${generateUuid()}.${fileType}`;
 
       return callback(null, filename);
     },
