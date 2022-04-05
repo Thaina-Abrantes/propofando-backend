@@ -8,6 +8,11 @@ const { uploadConfig } = require('../../configs/multer.config');
 
 const routes = Router();
 
-routes.post('/upload', authentication, uploadConfig.single('file'), createGenericUpload);
+routes.post(
+    '/upload',
+    authentication,
+    uploadConfig.single('file'),
+    createGenericUpload,
+);
 
 module.exports = routes;
