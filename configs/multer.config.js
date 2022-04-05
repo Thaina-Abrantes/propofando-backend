@@ -2,7 +2,7 @@ const multer = require('multer');
 const { generateUuid } = require('../src/helpers/handleUuid');
 const path = require('path');
 
-const maxSizeInBytes = 500 * 1024 * 1024;
+const maxSizeInBytes = 200 * 1024 * 1024;
 
 const uploadFolder = path.resolve(__dirname, '../tmp/uploads');
 
