@@ -5,7 +5,11 @@ const { uploadFile } = require('../services/upload');
 const removeFileFromDisk = fsp.unlink;
 
 async function createGenericUpload(request, response) {
-  const { file } = request;
+  const { file, fileValidationError } = request;
+
+  if (request.fileValidationError) {
+    return response.status(400).json(fileValidationError);
+  }
 
   if (!file) {
     return response.status(400).json('Escolha um arquivo para fazer upload');

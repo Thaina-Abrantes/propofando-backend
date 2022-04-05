@@ -20,6 +20,22 @@ const uploadConfig = multer({
   limits: {
     fileSize: maxSizeInBytes,
   },
+  fileFilter: (req, file, callback) => {
+    const allowedMimes = [
+      'image',
+      'video',
+    ];
+
+    const mediaType = file.mimetype.split('/')[0];
+
+    if (allowedMimes.includes(mediaType)) {
+      callback(null, true);
+    } else {
+      req.fileValidationError = 'Somente imagens e vídeos são permitidos.';
+
+      callback(null, false);
+    }
+  },
 });
 
 module.exports = {
