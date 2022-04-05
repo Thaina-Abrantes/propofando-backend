@@ -1,6 +1,6 @@
 const fsp = require('fs/promises');
 
-const { uploadFile } = require('../helpers/handleUpload');
+const { uploadFile } = require('../services/upload');
 
 const removeFileFromDisk = fsp.unlink;
 
