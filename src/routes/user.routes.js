@@ -26,7 +26,7 @@ const {
     validateUpdatePasswordSquema,
 } = require('../helpers/validators/userSquema');
 
-const { validateUuidSchema } = require('../helpers/validators/genericSchema');
+const { validateUuidSchema, reportProblemSchema } = require('../helpers/validators/genericSchema');
 
 const routes = Router();
 
@@ -87,7 +87,7 @@ routes.post(
     '/users/report-problem',
     authentication,
     validateAccessPermission(['student']),
-    // validateBody(validateUpdatePasswordSquema),
+    validateBody(reportProblemSchema),
     reportProblem,
 );
 

@@ -1,6 +1,7 @@
 const yup = require('yup');
 const { pt } = require('yup-locales');
 const { setLocale } = require('yup');
+
 setLocale(pt);
 
 const validateUuidSchema = yup.object().shape({
@@ -14,8 +15,14 @@ const paginatedSchema = yup.object().shape({
   size: yup.number().positive(),
 });
 
+const reportProblemSchema = yup.object().shape({
+    description: yup.string()
+      .strict()
+      .required(),
+  });
 
 module.exports = {
   validateUuidSchema,
   paginatedSchema,
+  reportProblemSchema,
 };
