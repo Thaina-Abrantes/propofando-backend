@@ -1,16 +1,17 @@
 const { Router } = require('express');
 
-const { 
+const {
     getUser,
-    listUsers, 
+    listUsers,
     createUser,
     deleteUser,
     updateUser,
     recoveryPassword,
     redefinePassword,
+    reportProblem,
  } = require('../controllers/user');
 
-const { 
+const {
     validateBody,
     validateParams,
 } = require('../middlewares/validateRequest');
@@ -18,15 +19,15 @@ const {
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-const { 
+const {
     createUserSchema,
     validateEmailSchema,
     validateTokenSquema,
     validateUpdatePasswordSquema,
 } = require('../helpers/validators/userSquema');
 
-const { validateUuidSchema } = require('../helpers/validators/genericSchema');
- 
+const { validateUuidSchema, reportProblemSchema } = require('../helpers/validators/genericSchema');
+
 const routes = Router();
 
 routes.get(
@@ -70,16 +71,24 @@ routes.patch(
 );
 
 routes.post(
-    '/users/recovery-password', 
+    '/users/recovery-password',
     validateBody(validateEmailSchema),
     recoveryPassword,
 );
 
 routes.post(
-    '/users/redefine-password/:token', 
+    '/users/redefine-password/:token',
     validateParams(validateTokenSquema),
     validateBody(validateUpdatePasswordSquema),
     redefinePassword,
+);
+
+routes.post(
+    '/users/report-problem',
+    authentication,
+    validateAccessPermission(['student']),
+    validateBody(reportProblemSchema),
+    reportProblem,
 );
 
 module.exports = routes;

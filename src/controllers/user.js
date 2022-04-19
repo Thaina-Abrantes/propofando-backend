@@ -82,7 +82,7 @@ async function deleteUser(request, response) {
 
 async function updateUser(request, response) {
     const { id } = request.params;
-    const { name, email, password } = request.body;
+    const { name, email } = request.body;
 
     const existedUser = await userRepository.findOneBy({ id, deleted: false });
 
@@ -215,6 +215,35 @@ async function redefinePassword(request, response) {
     return response.status(200).json({ message: 'Senha atualizada!' });
   }
 
+async function reportProblem(request, response) {
+    const { description } = request.body;
+    const { name, email } = request.user;
+
+    const mailOptions = {
+        from: `${name} <${email}>`,
+        to: process.env.SUPER_ADMIN_EMAIL,
+        subject: 'Reportar Problema',
+        template: 'report-problem/index',
+        context: {
+            user: name,
+            descriptionProblem: description,
+            emailContact: process.env.EMAIL_PROPOFANDO,
+        },
+    };
+
+    const emailSent = await sendMail(mailOptions);
+
+    if (!emailSent) {
+      return response.status(400).json({
+          message: 'Não foi possível enviar um email reportando o problema.',
+      });
+    }
+
+    return response.status(200).json({
+        message: 'Email enviado com sucesso.',
+    });
+}
+
 module.exports = {
     getUser,
     listUsers,
@@ -223,4 +252,5 @@ module.exports = {
     updateUser,
     recoveryPassword,
     redefinePassword,
+    reportProblem,
 };
