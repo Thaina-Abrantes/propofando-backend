@@ -45,7 +45,7 @@ async function listUsers(_, response) {
 }
 
 async function createUser(request, response) {
-    const { name, email, password } = request.body;
+    const { name, email } = request.body;
 
     const registeredEmail = await verifyDuplicatedEmail(email);
 
@@ -95,15 +95,17 @@ async function updateUser(request, response) {
     if (!registeredEmail.success) {
         return response.status(400).json({ message: registeredEmail.message });
     }
-
-    const defaultPassword = await passwordEdit(email);
-
-    const encryptedPassword = await encryptPassword(defaultPassword);
-
-    const updatedUser = await userRepository.update({
-        id, name, email, password: encryptedPassword,
-    });
-
+    let updatedUser = '';
+    if (password) {
+        const encryptedPassword = await encryptPassword(password);
+          updatedUser = await userRepository.update({
+            id, name, email, password: encryptedPassword,
+           });
+    } else {
+        updatedUser = await userRepository.update({
+            id, name, email,
+           });
+    }
     if (!updatedUser) {
         return response.status(400).json({ message: 'Erro ao atualizar usuário.' });
     }
