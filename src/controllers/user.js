@@ -95,10 +95,9 @@ async function updateUser(request, response) {
     if (!registeredEmail.success) {
         return response.status(400).json({ message: registeredEmail.message });
     }
-    let encryptedPassword = '';
     let updatedUser = '';
     if (password) {
-         encryptedPassword = await encryptPassword(password);
+        const encryptedPassword = await encryptPassword(password);
           updatedUser = await userRepository.update({
             id, name, email, password: encryptedPassword,
            });
