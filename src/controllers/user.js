@@ -96,17 +96,17 @@ async function updateUser(request, response) {
         return response.status(400).json({ message: registeredEmail.message });
     }
     let encryptedPassword = '';
+    let updatedUser = '';
     if (password) {
          encryptedPassword = await encryptPassword(password);
+          updatedUser = await userRepository.update({
+            id, name, email, password: encryptedPassword,
+           });
     } else {
-        const defaultPassword = await passwordEdit(email);
-         encryptedPassword = await encryptPassword(defaultPassword);
+        updatedUser = await userRepository.update({
+            id, name, email,
+           });
     }
-
-    const updatedUser = await userRepository.update({
- id, name, email, password: encryptedPassword,
-});
-
     if (!updatedUser) {
         return response.status(400).json({ message: 'Erro ao atualizar usuário.' });
     }
