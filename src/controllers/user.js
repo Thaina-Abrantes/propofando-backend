@@ -43,6 +43,20 @@ async function listUsers(_, response) {
 
     return response.status(201).json(cleanedUsers);
 }
+async function listUserPaginated(request, response) {
+    const { page, size } = request.query;
+
+    const users = await userRepository.getUsers(page, size);
+
+    const { totalUsers, totalPages, currentPage } = users;
+
+    return response.status(200).json({
+        users,
+        totalUsers,
+        totalPages,
+        currentPage,
+    });
+}
 
 async function createUser(request, response) {
     const { name, email } = request.body;
@@ -82,7 +96,7 @@ async function deleteUser(request, response) {
 
 async function updateUser(request, response) {
     const { id } = request.params;
-    const { name, email } = request.body;
+    const { name, email, password } = request.body;
 
     const existedUser = await userRepository.findOneBy({ id, deleted: false });
 
@@ -253,4 +267,5 @@ module.exports = {
     recoveryPassword,
     redefinePassword,
     reportProblem,
+    listUserPaginated,
 };

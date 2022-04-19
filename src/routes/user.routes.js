@@ -9,6 +9,7 @@ const {
     recoveryPassword,
     redefinePassword,
     reportProblem,
+    listUserPaginated,
  } = require('../controllers/user');
 
 const {
@@ -29,6 +30,12 @@ const {
 const { validateUuidSchema, reportProblemSchema } = require('../helpers/validators/genericSchema');
 
 const routes = Router();
+routes.get(
+    '/users/paginated',
+    authentication,
+    validateAccessPermission(['super admin']),
+    listUserPaginated,
+);
 
 routes.get(
     '/users/:id',
@@ -36,6 +43,7 @@ routes.get(
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
     getUser,
+
 );
 
 routes.get(
