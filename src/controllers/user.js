@@ -1,10 +1,10 @@
 const { UserRepository } = require('../repositories/UserRepository');
-const { RecoveryRepository} = require('../repositories/RecoveryRepository');
+const { RecoveryRepository } = require('../repositories/RecoveryRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
 
-const { 
+const {
     verifyDuplicatedEmail,
     passwordEdit,
     clearUserObject,
@@ -100,7 +100,9 @@ async function updateUser(request, response) {
 
     const encryptedPassword = await encryptPassword(defaultPassword);
 
-    const updatedUser = await userRepository.update({ id, name, email, password: encryptedPassword });
+    const updatedUser = await userRepository.update({
+ id, name, email, password: encryptedPassword,
+});
 
     if (!updatedUser) {
         return response.status(400).json({ message: 'Erro ao atualizar usuário.' });
@@ -115,16 +117,16 @@ async function recoveryPassword(request, response) {
     const user = await userRepository.findOneBy({
         email,
         userType: 'student',
-        active: true, 
-        deleted:false
+        active: true,
+        deleted: false,
     });
-  
+
     if (!user) {
         return response.status(404).json({
-            message: `Não foi possível enviar um email para ${email}. Favor verifique se o email informado está correto.`
+            message: `Não foi possível enviar um email para ${email}. Favor verifique se o email informado está correto.`,
         });
     }
-    
+
     const creationDate = new Date();
     const resetToken = generateUuid(user.email);
     const expiredAt = addTime(creationDate, { hours: 1 });
@@ -132,17 +134,17 @@ async function recoveryPassword(request, response) {
     const transaction = await generateTransaction();
 
     const insertedInfo = await recoveryRepository.withTransaction(transaction).insert({
-        token: resetToken, 
+        token: resetToken,
         expiredAt,
         userId: user.id,
     });
-  
+
     if (!insertedInfo) {
         return response.status(400).json({
-            message: `Ops! Não foi possível enviar um email para ${email}.`
+            message: `Ops! Não foi possível enviar um email para ${email}.`,
         });
     }
-  
+
     const mailOptions = {
         from: 'Propofando <não-responda@propofando.com>',
         to: email,
@@ -150,69 +152,68 @@ async function recoveryPassword(request, response) {
         template: 'recovery-password/index',
         context: {
             user: user.name,
-            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}?token=${resetToken}`,
-            emailContact: process.env.EMAIL_PROPOFANDO
+            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}/${resetToken}`,
+            emailContact: process.env.EMAIL_PROPOFANDO,
         },
     };
-  
+
     const emailSent = await sendMail(mailOptions);
-  
+
     if (!emailSent) {
       return response.status(400).json({
-          message: `Não foi possível enviar um email para ${email}. Verifique o email fornecido.`
+          message: `Não foi possível enviar um email para ${email}. Verifique o email fornecido.`,
       });
     }
 
     transaction.commit();
-  
+
     return response.status(200).json({
         message: `O email foi enviado para ${email} com um link para resetar sua senha.`,
     });
-
-}   
+}
 
 async function redefinePassword(request, response) {
     const { token } = request.params;
     const { password } = request.body;
-    
+
     const registeredToken = await recoveryRepository.findOneBy({ token });
-  
+
     const tokenExpired = await checkIsValidDate(new Date(), registeredToken?.expiredAt);
-  
+
     if (!registeredToken || tokenExpired) {
         return response.status(400).json({
-            message: 'Ação inválida. Solicite novamente uma nova senha.'
+            message: 'Ação inválida. Solicite novamente uma nova senha.',
         });
     }
-  
+
     const encryptedPassword = await encryptPassword(password);
 
     const transaction = await generateTransaction();
 
     const { id, userId } = registeredToken;
-  
+
     const updatedPassword = await userRepository
         .withTransaction(transaction)
-        .update({id: userId, password: encryptedPassword});
-  
+        .update({ id: userId, password: encryptedPassword });
+
     if (!updatedPassword) {
-      return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
+      return response.status(400).json({ message: 'Não foi possível realizar a troca de senha.' });
     }
 
     const deleteResetToken = await recoveryRepository
         .withTransaction(transaction)
         .delete(id);
-   
+
     if (!deleteResetToken) {
-        return response.status(400).json({message: 'Não foi possível realizar a troca de senha.'});
+        return response.status(400).json({ message: 'Não foi possível realizar a troca de senha.' });
     }
 
     transaction.commit();
-  
-    return response.status(200).json({message: 'Senha atualizada!'});
+
+    return response.status(200).json({ message: 'Senha atualizada!' });
   }
 
-module.exports = { 
+module.exports = {
     getUser,
     listUsers,
     createUser,
@@ -220,4 +221,4 @@ module.exports = {
     updateUser,
     recoveryPassword,
     redefinePassword,
-}
+};
