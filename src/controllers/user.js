@@ -45,7 +45,7 @@ async function listUsers(_, response) {
 }
 
 async function createUser(request, response) {
-    const { name, email, password } = request.body;
+    const { name, email } = request.body;
 
     const registeredEmail = await verifyDuplicatedEmail(email);
 
@@ -82,7 +82,7 @@ async function deleteUser(request, response) {
 
 async function updateUser(request, response) {
     const { id } = request.params;
-    const { name, email, password } = request.body;
+    const { name, email } = request.body;
 
     const existedUser = await userRepository.findOneBy({ id, deleted: false });
 
@@ -95,15 +95,18 @@ async function updateUser(request, response) {
     if (!registeredEmail.success) {
         return response.status(400).json({ message: registeredEmail.message });
     }
-
-    const defaultPassword = await passwordEdit(email);
-
-    const encryptedPassword = await encryptPassword(defaultPassword);
-
-    const updatedUser = await userRepository.update({
- id, name, email, password: encryptedPassword,
-});
-
+    
+    let updatedUser = '';
+    if (password) {
+        const encryptedPassword = await encryptPassword(password);
+          updatedUser = await userRepository.update({
+            id, name, email, password: encryptedPassword,
+           });
+    } else {
+        updatedUser = await userRepository.update({
+            id, name, email,
+           });
+    }
     if (!updatedUser) {
         return response.status(400).json({ message: 'Erro ao atualizar usuário.' });
     }
@@ -213,6 +216,35 @@ async function redefinePassword(request, response) {
     return response.status(200).json({ message: 'Senha atualizada!' });
   }
 
+async function reportProblem(request, response) {
+    const { description } = request.body;
+    const { name, email } = request.user;
+
+    const mailOptions = {
+        from: `${name} <${email}>`,
+        to: process.env.SUPER_ADMIN_EMAIL,
+        subject: 'Reportar Problema',
+        template: 'report-problem/index',
+        context: {
+            user: name,
+            descriptionProblem: description,
+            emailContact: process.env.EMAIL_PROPOFANDO,
+        },
+    };
+
+    const emailSent = await sendMail(mailOptions);
+
+    if (!emailSent) {
+      return response.status(400).json({
+          message: 'Não foi possível enviar um email reportando o problema.',
+      });
+    }
+
+    return response.status(200).json({
+        message: 'Email enviado com sucesso.',
+    });
+}
+
 module.exports = {
     getUser,
     listUsers,
@@ -221,4 +253,5 @@ module.exports = {
     updateUser,
     recoveryPassword,
     redefinePassword,
+    reportProblem,
 };
