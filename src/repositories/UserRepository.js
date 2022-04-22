@@ -12,7 +12,10 @@ class UserRepository extends BaseRepository {
         pageNumber = pageNumber || 1;
         size = size || 6;
 
-        const rowCount = await knex('users').count('*').where('users.active', true);
+        const rowCount = await knex('users').count('*').where({
+        'users.userType': 'student',
+        'users.active': true,
+        });
 
         const { count } = rowCount[0];
 
@@ -26,9 +29,12 @@ class UserRepository extends BaseRepository {
                 'users.name',
                 'users.email',
                 'users.active',
+                'users.userType',
             )
-            .where('users.active', true)
-            .limit(size)
+            .where({
+                'users.userType': 'student',
+                'users.active': true,
+           }).limit(size)
             .offset(page)
             .returning('*');
 
