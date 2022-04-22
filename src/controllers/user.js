@@ -95,6 +95,7 @@ async function updateUser(request, response) {
     if (!registeredEmail.success) {
         return response.status(400).json({ message: registeredEmail.message });
     }
+    
     let updatedUser = '';
     if (password) {
         const encryptedPassword = await encryptPassword(password);
@@ -154,7 +155,7 @@ async function recoveryPassword(request, response) {
         template: 'recovery-password/index',
         context: {
             user: user.name,
-            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}?token=${resetToken}`,
+            urlRecoveryPassword: `${process.env.URL_RECOVERY_PASSWORD}/${resetToken}`,
             emailContact: process.env.EMAIL_PROPOFANDO,
         },
     };
