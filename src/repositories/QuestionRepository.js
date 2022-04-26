@@ -19,7 +19,7 @@ class QuestionRepository extends BaseRepository {
                 'q.image',
                 'q.explanationVideo',
                 'q.explanationText',
-                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
+                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'option', a.option, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .where('q.id', id)
             .groupBy('q.id')
@@ -56,7 +56,7 @@ class QuestionRepository extends BaseRepository {
                 'q.image',
                 'q.explanationVideo',
                 'q.explanationText',
-                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
+                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'option', a.option, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .where((builder) => {
                 if (category) {
