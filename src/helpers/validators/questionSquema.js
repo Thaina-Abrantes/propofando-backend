@@ -41,8 +41,7 @@ const updateQuestionSchema = yup.object().shape({
     .max(1620),
 
   categoryId: yup.string()
-    .uuid()
-    .required(),
+    .uuid(),
 
   image: yup.string(),
 

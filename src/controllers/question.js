@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { AlternativeRepository } = require('../repositories/AlternativeRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
@@ -130,10 +131,11 @@ async function updateQuestion(request, response) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
-    const existedCategory = await categoryRepository.get(categoryId);
-
-    if (categoryId && !existedCategory) {
-        return response.status(404).json({ message: 'Categoria não encontrada.' });
+    if (categoryId) {
+        const existedCategory = await categoryRepository.get(categoryId);
+        if (!existedCategory) {
+            return response.status(404).json({ message: 'Categoria não encontrada.' });
+        }
     }
 
     const transaction = await generateTransaction();
@@ -141,8 +143,14 @@ async function updateQuestion(request, response) {
     const updatedQuestion = await questionRepository
         .withTransaction(transaction)
         .update({
- id, title, description, categoryId, image, explanationVideo, explanationText,
-});
+            id,
+            title,
+            description,
+            categoryId,
+            image,
+            explanationVideo,
+            explanationText,
+        });
 
     if (!updatedQuestion) {
         return response.status(400).json({ message: 'Erro ao atualizar questão.' });
@@ -151,11 +159,14 @@ async function updateQuestion(request, response) {
     for (const alternative of alternatives) {
         const {
             id: alternativeId,
+            option,
             description: alternativeDescription,
             correct,
         } = alternative;
 
-        const existedAlternative = await alternativeRepository.findOneBy({ id: alternativeId, questionId: id });
+        const existedAlternative = await alternativeRepository.findOneBy(
+            { id: alternativeId, questionId: id },
+);
 
         if (!existedAlternative) {
             return response.status(404).json({
@@ -165,7 +176,12 @@ async function updateQuestion(request, response) {
 
         const updatedAlternative = await alternativeRepository
             .withTransaction(transaction)
-            .update({ id: alternativeId, description: alternativeDescription, correct });
+            .update({
+                id: alternativeId,
+                option,
+                description: alternativeDescription,
+                correct,
+            });
 
         if (!updatedAlternative) {
             return response.status(400).json({ message: 'Erro ao atualizar alternativa da questão.' });
