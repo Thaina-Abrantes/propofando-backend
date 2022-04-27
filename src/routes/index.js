@@ -9,12 +9,14 @@ const loginRoutes = require('./login.routes');
 const categoriesRoutes = require('./category.routes');
 const questionRoutes = require('./question.routes');
 const fileRoutes = require('./upload.routes');
+const simulatedRoutes = require('./simulated.routes');
 
 routes.use(userRoutes);
 routes.use(loginRoutes);
 routes.use(categoriesRoutes);
 routes.use(questionRoutes);
 routes.use(fileRoutes);
+routes.use(simulatedRoutes);
 
 routes.use(globalErrorHandler);
 
