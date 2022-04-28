@@ -25,6 +25,17 @@ async function listQuestions(request, response) {
 
     const questions = await questionRepository.getQuestions(page, size, category);
 
+    for (const { alternatives } of questions) {
+        const alternativesOrdened = alternatives.sort((a, b) => {
+            if (a.option > b.option) {
+                return 1;
+            }
+                return -1;
+        });
+
+        questions.alternatives = alternativesOrdened;
+    }
+
     const { totalItems } = questions;
     const { totalPages } = questions;
     const { currentPage } = questions;
