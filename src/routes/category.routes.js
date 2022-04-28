@@ -21,14 +21,14 @@ const routes = Router();
 routes.get(
     '/categories/paginated',
     authentication,
-    validateAccessPermission(['super admin']),
+    validateAccessPermission(['super admin', 'student']),
     listCategoriesPaginated,
 );
 
 routes.get(
     '/categories/:id',
     authentication,
-    validateAccessPermission(['super admin']),
+    validateAccessPermission(['super admin', 'student']),
     validateParams(validateUuidSchema),
     getCategory,
 );
@@ -36,7 +36,7 @@ routes.get(
 routes.get(
     '/categories',
     authentication,
-    validateAccessPermission(['super admin']),
+    validateAccessPermission(['super admin', 'student']),
     listCategories,
 );
 
