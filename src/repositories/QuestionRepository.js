@@ -1,11 +1,11 @@
-const knexConfig = require("../../knexfile")
-const knex = require("knex")(knexConfig)
+const knexConfig = require('../../knexfile');
+const knex = require('knex')(knexConfig);
 
-const { BaseRepository } = require("@cubos/knex-repository");
+const { BaseRepository } = require('@cubos/knex-repository');
 
 class QuestionRepository extends BaseRepository {
     constructor() {
-        super(knex, "questions");
+        super(knex, 'questions');
     }
 
     async getQuestion(id) {
@@ -24,7 +24,7 @@ class QuestionRepository extends BaseRepository {
             .where('q.id', id)
             .groupBy('q.id')
             .returning('*');
-    
+
         return question;
     }
 
@@ -63,11 +63,12 @@ class QuestionRepository extends BaseRepository {
                   builder.where('q.categoryId', category);
                 }
             })
+            .orderBy('q.title')
             .groupBy('q.id')
             .limit(size)
             .offset(page)
             .returning('*');
-    
+
         questions.totalItems = count;
         questions.totalPages = numberOfPages >= 1 ? numberOfPages : 1;
         questions.currentPage = parseInt(pageNumber, 10);
