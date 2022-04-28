@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { AlternativeRepository } = require('../repositories/AlternativeRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
@@ -166,7 +165,7 @@ async function updateQuestion(request, response) {
 
         const existedAlternative = await alternativeRepository.findOneBy(
             { id: alternativeId, questionId: id },
-);
+        );
 
         if (!existedAlternative) {
             return response.status(404).json({
