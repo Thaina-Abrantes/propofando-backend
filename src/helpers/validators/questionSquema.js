@@ -7,15 +7,15 @@ setLocale(pt);
 const createQuestionSchema = yup.object().shape({
   title: yup.string()
     .max(200)
-    .required(),
+    .required('Título é obrigatório'),
 
   description: yup.string()
     .max(1620)
-    .required(),
+    .required('Descrição da questão é obrigatório'),
 
   categoryId: yup.string()
-    .uuid()
-    .required(),
+    .uuid('Selecione uma categoria válida')
+    .required('Categoria é obrigatório'),
 
   image: yup.string(),
 
@@ -27,7 +27,7 @@ const createQuestionSchema = yup.object().shape({
   alternatives: yup.array().of(
     yup.object().shape({
       option: yup.string(),
-      description: yup.string().required(),
+      description: yup.string().required('Adicione uma descrição para a alternativa'),
       correct: yup.boolean(),
     }).required(),
   ).required(),
@@ -43,9 +43,9 @@ const updateQuestionSchema = yup.object().shape({
   categoryId: yup.string()
     .uuid(),
 
-  image: yup.string(),
+  image: yup.string().nullable(),
 
-  explanationVideo: yup.string(),
+  explanationVideo: yup.string().nullable(),
 
   explanationText: yup.string().max(1620),
 
