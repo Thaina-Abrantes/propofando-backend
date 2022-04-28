@@ -17,6 +17,16 @@ async function getQuestion(request, response) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
+    let { alternatives } = question[0];
+    const alternativesOrdened = alternatives.sort((a, b) => {
+        if (a.option > b.option) {
+            return 1;
+        }
+            return -1;
+    });
+
+    alternatives = alternativesOrdened;
+
     return response.status(200).json(question[0]);
 }
 
@@ -25,7 +35,7 @@ async function listQuestions(request, response) {
 
     const questions = await questionRepository.getQuestions(page, size, category);
 
-    for (const { alternatives } of questions) {
+    for (let { alternatives } of questions) {
         const alternativesOrdened = alternatives.sort((a, b) => {
             if (a.option > b.option) {
                 return 1;
@@ -33,7 +43,7 @@ async function listQuestions(request, response) {
                 return -1;
         });
 
-        questions.alternatives = alternativesOrdened;
+        alternatives = alternativesOrdened;
     }
 
     const { totalItems } = questions;
