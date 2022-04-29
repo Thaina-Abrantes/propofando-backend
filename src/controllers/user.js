@@ -62,14 +62,29 @@ async function createUser(request, response) {
     const { name, email } = request.body;
 
     const registeredEmail = await verifyDuplicatedEmail(email);
+    const user = await userRepository.findOneBy({ email });
+    const defaultPassword = await passwordEdit(email);
+
+    const encryptedPassword = await encryptPassword(defaultPassword);
+
+    if (!registeredEmail.success && user.deleted && !user.active) {
+        const updateDelete = await userRepository.update({
+            id: user.id,
+            name,
+            email,
+            deleted: !user.deleted,
+            active: !user.active,
+            password: encryptedPassword,
+            });
+       if (!updateDelete) {
+           return response.status(400).json({ messagem: 'Não foi possivel cadastrar o usuário' });
+       }
+       return response.status(201).json({ message: 'Usuário cadastrado com sucesso.' });
+    }
 
     if (!registeredEmail.success) {
         return response.status(400).json({ message: registeredEmail.message });
     }
-
-    const defaultPassword = await passwordEdit(email);
-
-    const encryptedPassword = await encryptPassword(defaultPassword);
 
     await userRepository.insert({ name, email, password: encryptedPassword });
 
@@ -109,7 +124,7 @@ async function updateUser(request, response) {
     if (!registeredEmail.success) {
         return response.status(400).json({ message: registeredEmail.message });
     }
-    
+
     let updatedUser = '';
     if (password) {
         const encryptedPassword = await encryptPassword(password);
