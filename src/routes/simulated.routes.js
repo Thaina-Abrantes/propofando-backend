@@ -13,6 +13,7 @@ const {
 
 const routes = Router();
 
+// Refactor: Aplicar middlawares
 routes.post(
   '/simulated',
   createSimulated,

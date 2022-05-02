@@ -6,10 +6,12 @@ exports.up = async function (knex) {
     table.uuid('simulatedId').notNullable();
     table.uuid('userId').notNullable();
     table.uuid('altenativeId').notNullable();
+    table.uuid('questionId').notNullable();
     table.boolean('answered').defaultTo(false);
     table.foreign('userId').references('id').inTable('users');
     table.foreign('simulatedId').references('id').inTable('simulated');
     table.foreign('altenativeId').references('id').inTable('alternatives');
+    table.foreign('questionId').references('id').inTable('questions');
   });
 };
 
