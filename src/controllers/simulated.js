@@ -69,7 +69,11 @@ async function createSimulated(request, response) {
 
 // Feat: Criar controler para inserir resposta
 
+async function consultAnswers(request, response) {
+
+}
+
 module.exports = {
   createSimulated,
-  // listCategories,
+  consultAnswers,
 };
