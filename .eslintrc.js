@@ -24,6 +24,7 @@ module.exports = {
       files: ['*test.js', '*setup.js'],
       rules: {
         'no-undef': 'off',
+        'no-await-in-loop': 'off',
       },
     },
   ],

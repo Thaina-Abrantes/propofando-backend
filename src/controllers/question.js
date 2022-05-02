@@ -17,6 +17,16 @@ async function getQuestion(request, response) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
+    let { alternatives } = question[0];
+    const alternativesOrdened = alternatives.sort((a, b) => {
+        if (a.option > b.option) {
+            return 1;
+        }
+            return -1;
+    });
+
+    alternatives = alternativesOrdened;
+
     return response.status(200).json(question[0]);
 }
 
@@ -25,27 +35,38 @@ async function listQuestions(request, response) {
 
     const questions = await questionRepository.getQuestions(page, size, category);
 
-    const totalItems = questions.totalItems;
-    const totalPages = questions.totalPages;
-    const currentPage = questions.currentPage;
+    for (let { alternatives } of questions) {
+        const alternativesOrdened = alternatives.sort((a, b) => {
+            if (a.option > b.option) {
+                return 1;
+            }
+                return -1;
+        });
+
+        alternatives = alternativesOrdened;
+    }
+
+    const { totalItems } = questions;
+    const { totalPages } = questions;
+    const { currentPage } = questions;
 
     return response.status(200).json({
         totalItems,
-        questions, 
-        totalPages, 
-        currentPage
+        questions,
+        totalPages,
+        currentPage,
     });
 }
 
 async function createQuestion(request, response) {
-    const { 
+    const {
         title,
-        description, 
+        description,
         categoryId,
         image,
         explanationVideo,
-        explanationText, 
-        alternatives,      
+        explanationText,
+        alternatives,
     } = request.body;
 
     const existedCategory = await categoryRepository.get(categoryId);
@@ -54,11 +75,18 @@ async function createQuestion(request, response) {
         return response.status(404).json({ message: 'Categoria não encontrada.' });
     }
 
+    const alternativeCorrect = alternatives?.find((element) => element.correct === true);
+    if (!alternativeCorrect) {
+        return response.status(400).json({ message: 'Por favor, selecione uma alternativa correta' });
+    }
+
     const transaction = await generateTransaction();
 
     const registeredQuestion = await questionRepository
         .withTransaction(transaction)
-        .insert({ title, description, categoryId, image, explanationVideo, explanationText});
+        .insert({
+ title, description, categoryId, image, explanationVideo, explanationText,
+});
 
     for (const alternative of alternatives) {
         alternative.questionId = registeredQuestion.id;
@@ -67,8 +95,8 @@ async function createQuestion(request, response) {
     const registeredAlternatives = await alternativeRepository
         .withTransaction(transaction)
         .insertAll(alternatives);
-   
-    if(!registeredQuestion || !registeredAlternatives){
+
+    if (!registeredQuestion || !registeredAlternatives) {
         return response.status(400).json({ message: 'Não foi possível cadastrar a questão.' });
     }
 
@@ -90,7 +118,7 @@ async function deleteQuestion(request, response) {
 
     const deletedAlternatives = await alternativeRepository
         .withTransaction(transaction)
-        .deleteBy({questionId: id});
+        .deleteBy({ questionId: id });
 
     const deletedQuestion = await questionRepository
         .withTransaction(transaction)
@@ -105,58 +133,75 @@ async function deleteQuestion(request, response) {
     return response.status(200).json({ message: 'Questão deletada com sucesso.' });
 }
 
-async function updateQuestion(request, response){
+async function updateQuestion(request, response) {
     const { id } = request.params;
-    const { 
+    const {
         title,
-        description, 
+        description,
         categoryId,
         image,
         explanationVideo,
-        explanationText, 
-        alternatives,      
+        explanationText,
+        alternatives,
     } = request.body;
-    
+
     const existedQuestion = await questionRepository.get(id);
 
     if (!existedQuestion) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
-    const existedCategory = await categoryRepository.get(categoryId);
-
-    if (categoryId && !existedCategory) {
-        return response.status(404).json({ message: 'Categoria não encontrada.' });
+    if (categoryId) {
+        const existedCategory = await categoryRepository.get(categoryId);
+        if (!existedCategory) {
+            return response.status(404).json({ message: 'Categoria não encontrada.' });
+        }
     }
 
     const transaction = await generateTransaction();
 
     const updatedQuestion = await questionRepository
         .withTransaction(transaction)
-        .update({id, title, description, categoryId, image, explanationVideo, explanationText});
+        .update({
+            id,
+            title,
+            description,
+            categoryId,
+            image,
+            explanationVideo,
+            explanationText,
+        });
 
     if (!updatedQuestion) {
         return response.status(400).json({ message: 'Erro ao atualizar questão.' });
     }
 
     for (const alternative of alternatives) {
-        const { 
+        const {
             id: alternativeId,
-            description: alternativeDescription, 
-            correct
+            option,
+            description: alternativeDescription,
+            correct,
         } = alternative;
 
-        const existedAlternative = await alternativeRepository.findOneBy({id: alternativeId, questionId: id}); 
-        
+        const existedAlternative = await alternativeRepository.findOneBy(
+            { id: alternativeId, questionId: id },
+        );
+
         if (!existedAlternative) {
             return response.status(404).json({
-                    message: `Alternativa não encontrada para esta questão com o id: ${alternativeId}` 
+                    message: `Alternativa não encontrada para esta questão com o id: ${alternativeId}`,
             });
         }
 
         const updatedAlternative = await alternativeRepository
             .withTransaction(transaction)
-            .update({id: alternativeId, description: alternativeDescription, correct}); 
+            .update({
+                id: alternativeId,
+                option,
+                description: alternativeDescription,
+                correct,
+            });
 
         if (!updatedAlternative) {
             return response.status(400).json({ message: 'Erro ao atualizar alternativa da questão.' });
@@ -174,4 +219,4 @@ module.exports = {
     createQuestion,
     deleteQuestion,
     updateQuestion,
-}
+};

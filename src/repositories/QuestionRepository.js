@@ -19,28 +19,9 @@ class QuestionRepository extends BaseRepository {
                 'q.image',
                 'q.explanationVideo',
                 'q.explanationText',
-                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
+                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'option', a.option, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .where('q.id', id)
-            .groupBy('q.id')
-            .returning('*');
-
-        return question;
-    }
-
-    async getQuestionAvailable(id) {
-        const question = await knex('questions as q')
-            .leftOuterJoin('questions_sort_simulated as a', 'a.questionId', 'q.id')
-            .select(
-                'q.id',
-                'q.title',
-                'q.description',
-                'q.categoryId',
-                'q.image',
-                'q.explanationVideo',
-                'q.explanationText',
-            )
-            .where('a.userId', id)
             .groupBy('q.id')
             .returning('*');
 
@@ -75,13 +56,14 @@ class QuestionRepository extends BaseRepository {
                 'q.image',
                 'q.explanationVideo',
                 'q.explanationText',
-                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'description', a.description, 'correct', a.correct)) as alternatives"),
+                knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'option', a.option, 'description', a.description, 'correct', a.correct)) as alternatives"),
             )
             .where((builder) => {
                 if (category) {
                     builder.where('q.categoryId', category);
                 }
             })
+            .orderBy('q.title')
             .groupBy('q.id')
             .limit(size)
             .offset(page)
