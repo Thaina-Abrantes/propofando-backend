@@ -60,7 +60,7 @@ class QuestionRepository extends BaseRepository {
             )
             .where((builder) => {
                 if (category) {
-                  builder.where('q.categoryId', category);
+                    builder.where('q.categoryId', category);
                 }
             })
             .orderBy('q.title')
