@@ -85,11 +85,10 @@ async function consultAnswers(request, response) {
     const question = await questionRepository.getQuestion(questionId);
 
     for (const alternative of question[0].alternatives) {
+      alternative.isUserAnswer = false;
       if (altenativeId === alternative.id && answered) {
         alternative.isUserAnswer = true;
-        break;
       }
-      alternative.isUserAnswer = false;
     }
 
     answers.push(question);
