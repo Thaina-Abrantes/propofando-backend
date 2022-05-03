@@ -77,21 +77,14 @@ async function consultAnswers(request, response) {
   if (!simulatedQuestions) {
     return response.status(404).json({ message: 'Simulado não encontrado.' });
   }
-    // console.log(simulatedQuestions, 'simulatedQuestions');
 
   const answers = [];
   for (const simulatedQuestion of simulatedQuestions) {
     const { questionId, altenativeId, answered } = simulatedQuestion;
-    // console.log(simulatedQuestion, 'simulatedQ');
 
     const question = await questionRepository.getQuestion(questionId);
-    // console.log(question[0], 'question');
 
     for (const alternative of question[0].alternatives) {
-      // console.log(altenativeId, 'alternative');
-      // console.log(alternative, 'alternative');
-      // console.log(answered, 'answered');
-
       if (altenativeId === alternative.id && answered) {
         alternative.isUserAnswer = true;
         break;
