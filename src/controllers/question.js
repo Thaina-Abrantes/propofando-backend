@@ -213,10 +213,29 @@ async function updateQuestion(request, response) {
     return response.status(200).json({ message: 'Questão atualizada com sucesso.' });
 }
 
+async function getStatistics(request, response) {
+    const { id } = request.params;
+
+    // users com alternativa correta /total de usuários que responderam aquela questão
+    // user q responderam alternativeId /total de usuários que responderam aquela questão
+    const question = await questionRepository.get(id);
+
+    if (!question) {
+        return response.status(404).json({ message: 'Questão não encontrada.' });
+        }
+
+    const totalUsersAnswers = await questionRepository.getTotalUsersAnswered(id);
+
+    // const totalUsersAnswersCorrect = await questionRepository.getTotalUsersAnsweredCorrectly(id);
+
+  return response.status(200).json({ totalUsersAnswers});
+}
+
 module.exports = {
     getQuestion,
     listQuestions,
     createQuestion,
     deleteQuestion,
     updateQuestion,
+    getStatistics,
 };
