@@ -1,34 +1,41 @@
 const { Router } = require('express');
 
-const { 
-    getQuestion, 
+const {
+    getQuestion,
     listQuestions,
-    createQuestion, 
-    deleteQuestion, 
-    updateQuestion
+    createQuestion,
+    deleteQuestion,
+    updateQuestion,
+    getStatistics,
 } = require('../controllers/question');
 
-const { 
+const {
     validateBody,
     validateParams,
-    validateQuery 
+    validateQuery,
 } = require('../middlewares/validateRequest');
 
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-const { 
+const {
     validateUuidSchema,
-    paginatedSchema 
+    paginatedSchema,
 } = require('../helpers/validators/genericSchema');
 
-const { 
-    createQuestionSchema, 
-    updateQuestionSchema
+const {
+    createQuestionSchema,
+    updateQuestionSchema,
 } = require('../helpers/validators/questionSquema');
 
-
 const routes = Router();
+
+routes.get(
+    '/questions/:id/statistics',
+    authentication,
+    validateAccessPermission(['super admin', 'student']),
+    getStatistics,
+);
 
 routes.get(
     '/questions/:id',
