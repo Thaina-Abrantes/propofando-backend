@@ -75,6 +75,20 @@ class QuestionRepository extends BaseRepository {
 
         return questions;
     }
+
+    async answeredQuestionCorrectly() {
+        const questionAnsweredCorrectly = await knex('alternatives as a')
+        .leftJoin('questions_sort_simulated as qss', 'qss.questionId', 'a.questionId')
+        .seletc('qss.userId')
+        .where({
+        'qs.answered': true,
+        'a.correct': true,
+        })
+        .andWhere('qss.alternativeId', '=', 'a.id')
+        .count('*');
+
+        return questionAnsweredCorrectly;
+    }
 }
 
 module.exports = { QuestionRepository };

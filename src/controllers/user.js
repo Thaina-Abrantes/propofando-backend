@@ -1,8 +1,10 @@
 const { UserRepository } = require('../repositories/UserRepository');
 const { RecoveryRepository } = require('../repositories/RecoveryRepository');
+const { QuestionRepository } = require('../repositories/QuestionRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
+const questionRepository = new QuestionRepository();
 
 const {
     verifyDuplicatedEmail,
@@ -49,6 +51,9 @@ async function listUserPaginated(request, response) {
     const users = await userRepository.getUsers(page, size);
 
     const { totalUsers, totalPages, currentPage } = users;
+
+    const questoesCorretas = questionRepository.answeredQuestionCorrectly();
+    console.log(questoesCorretas);
 
     return response.status(200).json({
         users,
