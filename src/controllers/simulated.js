@@ -1,4 +1,4 @@
-/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
 const { SimulatedRepository } = require('../repositories/SimulatedRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 const { QuestionRepository } = require('../repositories/QuestionRepository');
@@ -70,7 +70,39 @@ async function createSimulated(request, response) {
 // Feat: Criar controler para inserir resposta
 
 async function consultAnswers(request, response) {
+  const { id } = request.params;
 
+  const simulatedQuestions = await simulatedSortQuestionsRepository.findBy({ simulatedId: id });
+
+  if (!simulatedQuestions) {
+    return response.status(404).json({ message: 'Simulado não encontrado.' });
+  }
+    // console.log(simulatedQuestions, 'simulatedQuestions');
+
+  const answers = [];
+  for (const simulatedQuestion of simulatedQuestions) {
+    const { questionId, altenativeId, answered } = simulatedQuestion;
+    // console.log(simulatedQuestion, 'simulatedQ');
+
+    const question = await questionRepository.getQuestion(questionId);
+    // console.log(question[0], 'question');
+
+    for (const alternative of question[0].alternatives) {
+      // console.log(altenativeId, 'alternative');
+      // console.log(alternative, 'alternative');
+      // console.log(answered, 'answered');
+
+      if (altenativeId === alternative.id && answered) {
+        alternative.isUserAnswer = true;
+        break;
+      }
+      alternative.isUserAnswer = false;
+    }
+
+    answers.push(question);
+  }
+
+  return response.status(200).json(answers);
 }
 
 module.exports = {

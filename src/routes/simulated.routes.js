@@ -14,17 +14,18 @@ const validateAccessPermission = require('../middlewares/validateAccessPermissio
 
 const routes = Router();
 
+routes.get(
+  '/simulated/answers/:id',
+  authentication,
+  validateAccessPermission(['super admin', 'student']),
+  consultAnswers,
+);
+
 // Refactor: Aplicar middlawares
 routes.post(
   '/simulated',
   createSimulated,
 );
 
-routes.post(
-  '/simulated/answers/:id',
-  authentication,
-  validateAccessPermission(['super admin, student']),
-  consultAnswers,
-);
 
 module.exports = routes;
