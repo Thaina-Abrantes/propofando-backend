@@ -274,6 +274,10 @@ async function reportProblem(request, response) {
     });
 }
 
+async function performanceUser(request, response) {
+    const { id } = request.params;
+}
+
 module.exports = {
     getUser,
     listUsers,
@@ -284,4 +288,5 @@ module.exports = {
     redefinePassword,
     reportProblem,
     listUserPaginated,
+    performanceUser,
 };
