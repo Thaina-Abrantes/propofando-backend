@@ -3,6 +3,7 @@ const { Router } = require('express');
 const {
   createSimulated,
   consultAnswers,
+  listSimulated,
 } = require('../controllers/simulated');
 
 const { validateParams } = require('../middlewares/validateRequest');
@@ -26,6 +27,11 @@ routes.get(
 routes.post(
   '/simulated',
   createSimulated,
+);
+
+routes.get(
+  '/simulated/:id',
+  listSimulated,
 );
 
 module.exports = routes;
