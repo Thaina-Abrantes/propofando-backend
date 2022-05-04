@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { AlternativeRepository } = require('../repositories/AlternativeRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
@@ -224,14 +225,28 @@ async function getStatistics(request, response) {
 
     const alternativeCorrect = await questionRepository.getAlternativeCorrectOfQuestion(id);
 
-    const answeredCorrect = await questionRepository
+    const answeredCorrectly = await questionRepository
         .getTotalUsersAnsweredCorrectly(id, alternativeCorrect.id);
 
     const totalUsersAnswers = await questionRepository.getTotalUsersAnswered(id);
 
-    const percentageGeneral = `${(answeredCorrect / totalUsersAnswers).toFixed(2) * 100}%`;
+    const percentageGeneralHits = `${(answeredCorrectly / totalUsersAnswers).toFixed(2) * 100}%`;
 
-  return response.status(200).json({ percentageGeneral });
+    const alternativesOfQuestion = await questionRepository.getAlternativesQuestion(id);
+
+    for (const alternative of alternativesOfQuestion) {
+        const answeredCorrect = await questionRepository
+            .getTotalUsersAnsweredCorrectly(id, alternative.id);
+        alternative.percentageSelectedThis = `${(answeredCorrect / totalUsersAnswers).toFixed(2) * 100}%`;
+
+        delete alternative.createdAt;
+        delete alternative.updatedAt;
+        delete alternative.description;
+        delete alternative.correct;
+        delete alternative.questionId;
+    }
+
+  return response.status(200).json({ percentageGeneralHits, alternativesOfQuestion });
 }
 
 module.exports = {

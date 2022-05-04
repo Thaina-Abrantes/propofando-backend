@@ -98,6 +98,16 @@ class QuestionRepository extends BaseRepository {
         return alternative[0];
     }
 
+    async getAlternativesQuestion(id) {
+        const alternatives = await knex('questions as q')
+            .leftJoin('alternatives as a', 'a.questionId', 'q.id')
+            .select('a.*')
+            .where('a.questionId', id)
+            .returning('*');
+
+        return alternatives;
+    }
+
     async getTotalUsersAnsweredCorrectly(id, alternativeCorrect) {
         const totalUsersAnsweredCorrectly = await knex('questions_sort_simulated as qsimulated')
             .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
