@@ -81,9 +81,10 @@ class QuestionRepository extends BaseRepository {
             .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
             .where('qsimulated.questionId', id)
             .andWhere('qsimulated.answered', true)
-            .countDistinct('qsimulated.userId');
+            .countDistinct('qsimulated.userId')
+            .returning('*');
 
-        return totalUsersAnswered;
+        return totalUsersAnswered[0].count;
     }
 
     async getAlternativeCorrectOfQuestion(id) {
@@ -94,7 +95,7 @@ class QuestionRepository extends BaseRepository {
             .andWhere('a.correct', true)
             .returning('*');
 
-        return alternative;
+        return alternative[0];
     }
 
     async getTotalUsersAnsweredCorrectly(id, alternativeCorrect) {
@@ -105,7 +106,7 @@ class QuestionRepository extends BaseRepository {
             .andWhere('qsimulated.altenativeId', alternativeCorrect)
             .countDistinct('qsimulated.userId');
 
-        return totalUsersAnsweredCorrectly;
+        return totalUsersAnsweredCorrectly[0].count;
     }
 }
 

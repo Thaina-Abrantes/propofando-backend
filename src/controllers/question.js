@@ -216,19 +216,22 @@ async function updateQuestion(request, response) {
 async function getStatistics(request, response) {
     const { id } = request.params;
 
-    // users com alternativa correta /total de usuários que responderam aquela questão
-    // user q responderam alternativeId /total de usuários que responderam aquela questão
     const question = await questionRepository.get(id);
 
     if (!question) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
-        }
+    }
+
+    const alternativeCorrect = await questionRepository.getAlternativeCorrectOfQuestion(id);
+
+    const answeredCorrect = await questionRepository
+        .getTotalUsersAnsweredCorrectly(id, alternativeCorrect.id);
 
     const totalUsersAnswers = await questionRepository.getTotalUsersAnswered(id);
 
-    // const totalUsersAnswersCorrect = await questionRepository.getTotalUsersAnsweredCorrectly(id);
+    const percentageGeneral = `${(answeredCorrect / totalUsersAnswers).toFixed(2) * 100}%`;
 
-  return response.status(200).json({ totalUsersAnswers});
+  return response.status(200).json({ percentageGeneral });
 }
 
 module.exports = {
