@@ -86,12 +86,23 @@ class QuestionRepository extends BaseRepository {
         return totalUsersAnswered;
     }
 
-    async getTotalUsersAnsweredCorrectly(id) {
+    async getAlternativeCorrectOfQuestion(id) {
+        const alternative = await knex('questions as q')
+            .leftJoin('alternatives as a', 'a.questionId', 'q.id')
+            .select('a.*')
+            .where('a.questionId', id)
+            .andWhere('a.correct', true)
+            .returning('*');
+
+        return alternative;
+    }
+
+    async getTotalUsersAnsweredCorrectly(id, alternativeCorrect) {
         const totalUsersAnsweredCorrectly = await knex('questions_sort_simulated as qsimulated')
             .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
             .leftJoin('alternatives as a', 'a.id', 'qsimulated.altenativeId')
             .where('qsimulated.questionId', id)
-            .andWhere('qsimulated.altenativeId', 'a.id')
+            .andWhere('qsimulated.altenativeId', alternativeCorrect)
             .countDistinct('qsimulated.userId');
 
         return totalUsersAnsweredCorrectly;
