@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { AlternativeRepository } = require('../repositories/AlternativeRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');

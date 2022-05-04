@@ -15,7 +15,7 @@ const { validateUuidSchema } = require('../helpers/validators/genericSchema');
 const routes = Router();
 
 routes.get(
-  '/simulated/answers/:id',
+  '/simulated/:id/answers',
   authentication,
   validateAccessPermission(['super admin', 'student']),
   validateParams(validateUuidSchema),

@@ -31,18 +31,19 @@ const {
 const routes = Router();
 
 routes.get(
-    '/questions/:id/statistics',
-    authentication,
-    validateAccessPermission(['super admin', 'student']),
-    getStatistics,
-);
-
-routes.get(
     '/questions/:id',
     authentication,
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
     getQuestion,
+);
+
+routes.get(
+    '/questions/:id/statistics',
+    authentication,
+    validateAccessPermission(['super admin', 'student']),
+    validateParams(validateUuidSchema),
+    getStatistics,
 );
 
 routes.get(
