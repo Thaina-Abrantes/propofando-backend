@@ -1,8 +1,10 @@
 const { UserRepository } = require('../repositories/UserRepository');
 const { RecoveryRepository } = require('../repositories/RecoveryRepository');
+const { SimulatedRepository } = require('../repositories/SimulatedRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
+const simulatedRepository = new SimulatedRepository();
 
 const {
     verifyDuplicatedEmail,
@@ -276,6 +278,10 @@ async function reportProblem(request, response) {
 
 async function performanceUser(request, response) {
     const { id } = request.params;
+
+    const totalSimulateds = await simulatedRepository.count({ userId: id });
+
+    return response.status(200).json({ totalSimulateds });
 }
 
 module.exports = {
