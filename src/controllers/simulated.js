@@ -67,6 +67,16 @@ async function createSimulated(request, response) {
   return response.status(201).json({ message: 'Simulado criado com sucesso.' });
 }
 
+async function listSimulated(request, response) {
+  const { id } = request.params;
+
+  const simuladosUser = await simulatedRepository.findBy(
+    { userId: id },
+  );
+
+  return response.status(201).json(simuladosUser);
+}
+
 // Feat: Criar controler para inserir resposta
 
 async function consultAnswers(request, response) {
@@ -100,4 +110,5 @@ async function consultAnswers(request, response) {
 module.exports = {
   createSimulated,
   consultAnswers,
+  listSimulated,
 };
