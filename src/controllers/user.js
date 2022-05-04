@@ -1,10 +1,14 @@
 const { UserRepository } = require('../repositories/UserRepository');
 const { RecoveryRepository } = require('../repositories/RecoveryRepository');
 const { SimulatedRepository } = require('../repositories/SimulatedRepository');
+const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
+const { QuestionRepository } = require('../repositories/QuestionRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
 const simulatedRepository = new SimulatedRepository();
+const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
+const questionRepository = new QuestionRepository();
 
 const {
     verifyDuplicatedEmail,
@@ -281,7 +285,14 @@ async function performanceUser(request, response) {
 
     const totalSimulateds = await simulatedRepository.count({ userId: id });
 
-    return response.status(200).json({ totalSimulateds });
+    const questionsAnswered = await simulatedSortQuestionsRepository
+        .count({ userId: id, answered: true });
+
+    const totalQuestionsDatabase = await questionRepository.count();
+
+    const percentageAnswered = `${((questionsAnswered / totalQuestionsDatabase) * 100).toFixed(2)}%`;
+
+    return response.status(200).json({ totalSimulateds, percentageAnswered });
 }
 
 module.exports = {
