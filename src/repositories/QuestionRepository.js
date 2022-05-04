@@ -77,15 +77,16 @@ class QuestionRepository extends BaseRepository {
     }
 
     async answeredQuestionCorrectly() {
-        const questionAnsweredCorrectly = await knex('alternatives as a')
-        .leftJoin('questions_sort_simulated as qss', 'qss.questionId', 'a.questionId')
-        .seletc('qss.userId')
+        const questionAnsweredCorrectly = await knex('users as u')
+        .leftJoin('simulated as s', 's.userId', 'u.id')
+        .leftJoin('questions_sort_simulated as qss', 'qss.simulatedId', 's.id')
+        .leftJoin('alternatives as a', 'a.questionId', 'qss.questionId')
+        .select('u.id', 'u.name', 'u.email', 'u.active', 'u.userType', knex.raw('SON_AGG(JSON_BUILD_OBJECT(count(*) filter(where qss.altenativeId = a.id and a.correct = true)) as correctAlternatives'))
         .where({
-        'qs.answered': true,
-        'a.correct': true,
+            'u.userType': 'student',
+            'u.active': true,
         })
-        .andWhere('qss.alternativeId', '=', 'a.id')
-        .count('*');
+        .groupBy('u.id', 'qss.userId');
 
         return questionAnsweredCorrectly;
     }

@@ -52,7 +52,8 @@ async function listUserPaginated(request, response) {
 
     const { totalUsers, totalPages, currentPage } = users;
 
-    const questoesCorretas = questionRepository.answeredQuestionCorrectly();
+    const questoesCorretas = await questionRepository.answeredQuestionCorrectly();
+
     console.log(questoesCorretas);
 
     return response.status(200).json({
