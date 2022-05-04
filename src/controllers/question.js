@@ -225,7 +225,7 @@ async function getStatistics(request, response) {
     const alternativeCorrect = await questionRepository.getAlternativeCorrectOfQuestion(id);
 
     const answeredCorrectly = await questionRepository
-        .getTotalUsersAnsweredCorrectly(id, alternativeCorrect.id);
+        .getTotalAnsweredSuchAlternative(id, alternativeCorrect.id);
 
     const totalUsersAnswers = await questionRepository.getTotalUsersAnswered(id);
 
@@ -235,7 +235,7 @@ async function getStatistics(request, response) {
 
     for (const alternative of alternativesOfQuestion) {
         const answeredCorrect = await questionRepository
-            .getTotalUsersAnsweredCorrectly(id, alternative.id);
+            .getTotalAnsweredSuchAlternative(id, alternative.id);
         alternative.percentageSelectedThis = `${(answeredCorrect / totalUsersAnswers).toFixed(2) * 100}%`;
 
         delete alternative.createdAt;
