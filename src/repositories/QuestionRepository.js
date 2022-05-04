@@ -103,6 +103,7 @@ class QuestionRepository extends BaseRepository {
             .leftJoin('alternatives as a', 'a.questionId', 'q.id')
             .select('a.*')
             .where('a.questionId', id)
+            .orderBy('a.option')
             .returning('*');
 
         return alternatives;
