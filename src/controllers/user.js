@@ -281,18 +281,32 @@ async function reportProblem(request, response) {
 }
 
 async function performanceUser(request, response) {
-    const { id } = request.params;
+    const { id: userId } = request.params;
 
-    const totalSimulateds = await simulatedRepository.count({ userId: id });
+    const totalSimulateds = await simulatedRepository.count({ userId });
 
-    const questionsAnswered = await simulatedSortQuestionsRepository
-        .count({ userId: id, answered: true });
+    const totalQuestionsAnswered = await simulatedSortQuestionsRepository
+        .count({ userId, answered: true });
 
     const totalQuestionsDatabase = await questionRepository.count();
 
-    const percentageAnswered = `${((questionsAnswered / totalQuestionsDatabase) * 100).toFixed(2)}%`;
+    const percentageAnswered = `${((totalQuestionsAnswered / totalQuestionsDatabase) * 100).toFixed(2)}%`;
 
-    return response.status(200).json({ totalSimulateds, percentageAnswered });
+    const questionsAnswered = await simulatedSortQuestionsRepository
+        .findBy({ userId, answered: true });
+
+    let totalHits = 0;
+    for (const { questionId } of questionsAnswered) {
+        const alternativeCorrect = await questionRepository
+            .getAlternativeCorrectOfQuestion(questionId);
+
+        totalHits += Number(await questionRepository
+        .getTotalAnsweredSuchAlternative(questionId, alternativeCorrect.id, userId));
+    }
+
+    const percentageHits = totalHits / totalQuestionsAnswered;
+
+    return response.status(200).json({ totalSimulateds, percentageAnswered, percentageHits });
 }
 
 module.exports = {

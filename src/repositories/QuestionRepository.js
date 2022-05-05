@@ -109,11 +109,16 @@ class QuestionRepository extends BaseRepository {
         return alternatives;
     }
 
-    async getTotalAnsweredSuchAlternative(id, alternative) {
+    async getTotalAnsweredSuchAlternative(id, alternative, userId) {
         const totalUsersAnswered = await knex('questions_sort_simulated as qsimulated')
             .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
             .leftJoin('alternatives as a', 'a.id', 'qsimulated.altenativeId')
             .where('qsimulated.questionId', id)
+            .where((builder) => {
+                if (userId) {
+                    builder.where('qsimulated.userId', userId);
+                }
+            })
             .andWhere('qsimulated.altenativeId', alternative)
             .countDistinct('qsimulated.userId');
 
