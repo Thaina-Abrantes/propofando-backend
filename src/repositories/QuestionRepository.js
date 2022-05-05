@@ -84,8 +84,6 @@ class QuestionRepository extends BaseRepository {
         'users.userType': 'student',
         'users.active': true,
         });
-        // const numberOfQuestions = await knex('questions as q').count('*');
-        // const { count: quantityQuestions } = numberOfQuestions[0];
 
         const { count } = rowCount[0];
 
