@@ -54,7 +54,11 @@ async function listUserPaginated(request, response) {
     const { totalUsers, totalPages, currentPage } = users;
 
     users.forEach((student) => {
+        if (numberOfQuestions <= 0) {
+            student.corrects = 0;
+        } else {
             student.corrects = ((Number(student.corrects) / numberOfQuestions).toFixed(2)) * 100;
+        }
     });
 
     return response.status(200).json({
