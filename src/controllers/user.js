@@ -15,6 +15,7 @@ const {
     passwordEdit,
     clearUserObject,
     verifyDuplicatedEmailWithoutMe,
+    formatInPercentage,
 } = require('../helpers/utils');
 
 const { encryptPassword } = require('../helpers/handlePassword');
@@ -290,7 +291,7 @@ async function performanceUser(request, response) {
 
     const totalQuestionsDatabase = await questionRepository.count();
 
-    const percentageAnswered = `${((totalQuestionsAnswered / totalQuestionsDatabase) * 100).toFixed(2)}%`;
+    const percentageAnswered = formatInPercentage(totalQuestionsAnswered / totalQuestionsDatabase);
 
     const questionsAnswered = await simulatedSortQuestionsRepository
         .findBy({ userId, answered: true });
@@ -304,7 +305,9 @@ async function performanceUser(request, response) {
         .getTotalAnsweredSuchAlternative(questionId, alternativeCorrect.id, userId));
     }
 
-    const percentageHits = totalHits / totalQuestionsAnswered;
+    const percentageHits = formatInPercentage(totalHits / totalQuestionsAnswered);
+
+    console.log(totalHits, 'hits', totalQuestionsAnswered);
 
     return response.status(200).json({ totalSimulateds, percentageAnswered, percentageHits });
 }
