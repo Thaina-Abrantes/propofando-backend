@@ -48,13 +48,14 @@ async function listUsers(_, response) {
 async function listUserPaginated(request, response) {
     const { page, size } = request.query;
 
-    const users = await userRepository.getUsers(page, size);
+    const users = await questionRepository.answeredQuestionCorrectly(page, size);
+    const numberOfQuestions = await questionRepository.getAllQuestions();
 
     const { totalUsers, totalPages, currentPage } = users;
 
-    const questoesCorretas = await questionRepository.answeredQuestionCorrectly();
-
-    console.log(questoesCorretas);
+    users.forEach((student) => {
+            student.corrects = ((Number(student.corrects) / numberOfQuestions).toFixed(2)) * 100;
+    });
 
     return response.status(200).json({
         users,
