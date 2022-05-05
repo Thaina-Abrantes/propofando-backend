@@ -75,6 +75,50 @@ class QuestionRepository extends BaseRepository {
 
         return questions;
     }
+
+    async getTotalUsersAnswered(id) {
+        const totalUsersAnswered = await knex('questions_sort_simulated as qsimulated')
+            .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
+            .where('qsimulated.questionId', id)
+            .andWhere('qsimulated.answered', true)
+            .countDistinct('qsimulated.userId')
+            .returning('*');
+
+        return totalUsersAnswered[0].count;
+    }
+
+    async getAlternativeCorrectOfQuestion(id) {
+        const alternative = await knex('questions as q')
+            .leftJoin('alternatives as a', 'a.questionId', 'q.id')
+            .select('a.*')
+            .where('a.questionId', id)
+            .andWhere('a.correct', true)
+            .returning('*');
+
+        return alternative[0];
+    }
+
+    async getAlternativesQuestion(id) {
+        const alternatives = await knex('questions as q')
+            .leftJoin('alternatives as a', 'a.questionId', 'q.id')
+            .select('a.*')
+            .where('a.questionId', id)
+            .orderBy('a.option')
+            .returning('*');
+
+        return alternatives;
+    }
+
+    async getTotalAnsweredSuchAlternative(id, alternative) {
+        const totalUsersAnswered = await knex('questions_sort_simulated as qsimulated')
+            .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
+            .leftJoin('alternatives as a', 'a.id', 'qsimulated.altenativeId')
+            .where('qsimulated.questionId', id)
+            .andWhere('qsimulated.altenativeId', alternative)
+            .countDistinct('qsimulated.userId');
+
+        return totalUsersAnswered[0].count;
+    }
 }
 
 module.exports = { QuestionRepository };
