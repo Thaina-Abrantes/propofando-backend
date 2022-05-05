@@ -101,7 +101,7 @@ async function consultAnswers(request, response) {
       }
     }
 
-    answers.push(question);
+    answers.push(question[0]);
   }
 
   return response.status(200).json(answers);
