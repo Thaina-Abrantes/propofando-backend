@@ -213,10 +213,46 @@ async function updateQuestion(request, response) {
     return response.status(200).json({ message: 'Questão atualizada com sucesso.' });
 }
 
+async function getStatistics(request, response) {
+    const { id } = request.params;
+
+    const question = await questionRepository.get(id);
+
+    if (!question) {
+        return response.status(404).json({ message: 'Questão não encontrada.' });
+    }
+
+    const alternativeCorrect = await questionRepository.getAlternativeCorrectOfQuestion(id);
+
+    const answeredCorrectly = await questionRepository
+        .getTotalAnsweredSuchAlternative(id, alternativeCorrect.id);
+
+    const totalUsersAnswers = await questionRepository.getTotalUsersAnswered(id);
+
+    const percentageGeneralHits = `${(answeredCorrectly / totalUsersAnswers).toFixed(2) * 100}%`;
+
+    const alternativesOfQuestion = await questionRepository.getAlternativesQuestion(id);
+
+    for (const alternative of alternativesOfQuestion) {
+        const answeredCorrect = await questionRepository
+            .getTotalAnsweredSuchAlternative(id, alternative.id);
+        alternative.percentageSelectedThis = `${(answeredCorrect / totalUsersAnswers).toFixed(2) * 100}%`;
+
+        delete alternative.createdAt;
+        delete alternative.updatedAt;
+        delete alternative.description;
+        delete alternative.correct;
+        delete alternative.questionId;
+    }
+
+  return response.status(200).json({ percentageGeneralHits, alternativesOfQuestion });
+}
+
 module.exports = {
     getQuestion,
     listQuestions,
     createQuestion,
     deleteQuestion,
     updateQuestion,
+    getStatistics,
 };
