@@ -10,6 +10,7 @@ const {
     redefinePassword,
     reportProblem,
     listUserPaginated,
+    top3Hits,
  } = require('../controllers/user');
 
 const {
@@ -30,6 +31,7 @@ const {
 const { validateUuidSchema, reportProblemSchema } = require('../helpers/validators/genericSchema');
 
 const routes = Router();
+
 routes.get(
     '/users/paginated',
     authentication,
@@ -43,7 +45,14 @@ routes.get(
     validateAccessPermission(['super admin']),
     validateParams(validateUuidSchema),
     getUser,
+);
 
+routes.get(
+    '/users/:id/top-3-hits',
+    authentication,
+    validateAccessPermission(['super admin', 'student']),
+    validateParams(validateUuidSchema),
+    top3Hits,
 );
 
 routes.get(

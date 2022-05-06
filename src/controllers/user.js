@@ -274,6 +274,12 @@ async function reportProblem(request, response) {
     });
 }
 
+async function top3Hits(request, response) {
+    const { id: userId } = request.params;
+
+    // const top3 = await 
+}
+
 module.exports = {
     getUser,
     listUsers,
@@ -284,4 +290,5 @@ module.exports = {
     redefinePassword,
     reportProblem,
     listUserPaginated,
+    top3Hits,
 };
