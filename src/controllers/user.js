@@ -1,8 +1,10 @@
 const { UserRepository } = require('../repositories/UserRepository');
 const { RecoveryRepository } = require('../repositories/RecoveryRepository');
+const { CategoryRepository } = require('../repositories/CategoryRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
+const categoryRepository = new CategoryRepository();
 
 const {
     verifyDuplicatedEmail,
@@ -277,7 +279,9 @@ async function reportProblem(request, response) {
 async function top3Hits(request, response) {
     const { id: userId } = request.params;
 
-    // const top3 = await 
+    const top3 = await categoryRepository.top3Hits(userId);
+
+    return response.status(200).json(top3);
 }
 
 module.exports = {
