@@ -122,6 +122,7 @@ async function sortedQuestions(
       simulatedId: registeredSimulated.id,
       userId,
       questionId: allQuestionRepository[indexQuestionSorted].id,
+      categoryId: allQuestionRepository[indexQuestionSorted].categoryId,
     });
 
     questionsSorted.push(questionSorted);
