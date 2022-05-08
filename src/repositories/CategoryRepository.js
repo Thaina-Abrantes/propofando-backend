@@ -46,9 +46,11 @@ class CategoryRepository extends BaseRepository {
             'c.name',
             knex.raw('count(*) filter(where qsimulated."altenativeId"= a.id and a.correct = true) as totalHits'),
         )
-        .where({ 'qsimulated.userId': userId })
+        .where('qsimulated.userId', userId)
         .groupBy('c.id')
+        .orderBy('totalhits', 'desc')
         .orderBy('c.name')
+        .limit(3)
         .returning('*');
 
         return top3Categories;
