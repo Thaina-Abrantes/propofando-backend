@@ -135,11 +135,7 @@ function clearTop3(categories) {
   const categoriesFiltered = categories.filter((category) => (category.totalhits
     ? category.totalhits > 0
     : category.totalincorrects > 0));
-  // for (const category of categories) {
-  //   if (category?.totalhits === 0 || category?.totalincorrects === 0) {
-  //     delete category;
-  //   }
-  // }
+
   return categoriesFiltered;
 }
 
