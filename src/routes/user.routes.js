@@ -11,6 +11,7 @@ const {
     reportProblem,
     listUserPaginated,
     top3Hits,
+    top3AnsweredIncorrectly,
  } = require('../controllers/user');
 
 const {
@@ -53,6 +54,14 @@ routes.get(
     validateAccessPermission(['super admin', 'student']),
     validateParams(validateUuidSchema),
     top3Hits,
+);
+
+routes.get(
+    '/users/:id/top-3-errors',
+    authentication,
+    validateAccessPermission(['super admin', 'student']),
+    validateParams(validateUuidSchema),
+    top3AnsweredIncorrectly,
 );
 
 routes.get(

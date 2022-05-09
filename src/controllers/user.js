@@ -279,7 +279,15 @@ async function reportProblem(request, response) {
 async function top3Hits(request, response) {
     const { id: userId } = request.params;
 
-    const top3 = await categoryRepository.top3Hits(userId);
+    const top3 = await categoryRepository.top3AnsweredCorrectly(userId);
+
+    return response.status(200).json(top3);
+}
+
+async function top3AnsweredIncorrectly(request, response) {
+    const { id: userId } = request.params;
+
+    const top3 = await categoryRepository.top3AnsweredIncorrectly(userId);
 
     return response.status(200).json(top3);
 }
@@ -295,4 +303,5 @@ module.exports = {
     reportProblem,
     listUserPaginated,
     top3Hits,
+    top3AnsweredIncorrectly,
 };

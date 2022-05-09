@@ -37,18 +37,37 @@ class CategoryRepository extends BaseRepository {
         return categories;
     }
 
-    async top3Hits(userId) {
+    async top3AnsweredCorrectly(userId) {
         const top3Categories = await knex('category as c')
         .leftJoin('questions_sort_simulated as qsimulated', 'qsimulated.categoryId', 'c.id')
         .leftJoin('alternatives as a', 'a.questionId', 'qsimulated.questionId')
         .select(
             'c.id',
             'c.name',
-            knex.raw('count(*) filter(where qsimulated."altenativeId"= a.id and a.correct = true) as totalHits'),
+            knex.raw('count(*) filter(where qsimulated.answered = true and qsimulated."altenativeId"= a.id and a.correct = true) as totalHits'),
         )
         .where('qsimulated.userId', userId)
         .groupBy('c.id')
         .orderBy('totalhits', 'desc')
+        .orderBy('c.name')
+        .limit(3)
+        .returning('*');
+
+        return top3Categories;
+    }
+
+    async top3AnsweredIncorrectly(userId) {
+        const top3Categories = await knex('category as c')
+        .leftJoin('questions_sort_simulated as qsimulated', 'qsimulated.categoryId', 'c.id')
+        .leftJoin('alternatives as a', 'a.questionId', 'qsimulated.questionId')
+        .select(
+            'c.id',
+            'c.name',
+            knex.raw('count(*) filter(where qsimulated.answered = true and qsimulated."altenativeId"= a.id and a.correct = false) as totalIncorrects'),
+        )
+        .where('qsimulated.userId', userId)
+        .groupBy('c.id')
+        .orderBy('totalincorrects', 'desc')
         .orderBy('c.name')
         .limit(3)
         .returning('*');
