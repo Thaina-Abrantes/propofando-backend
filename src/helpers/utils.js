@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-plusplus */
 const { UserRepository } = require('../repositories/UserRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
@@ -93,7 +91,7 @@ async function sortedQuestions(
 ) {
   const questionsSorted = [];
 
-  for (let index = 0; index < quantityQuestions; index++) {
+  for (let index = 0; index < quantityQuestions; index += 1) {
     const questionSorted = [];
     let indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
     let newSorted = false;
@@ -130,6 +128,10 @@ async function sortedQuestions(
   return questionsSorted;
 }
 
+function formatInPercentage(number) {
+ return `${Math.ceil(number * 100)}%`;
+}
+
 module.exports = {
   verifyDuplicatedEmail,
   clearUserObject,
@@ -139,4 +141,5 @@ module.exports = {
   verifyDuplicatedCategory,
   getRandomInt,
   sortedQuestions,
+  formatInPercentage,
 };

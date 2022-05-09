@@ -1,9 +1,13 @@
 const { UserRepository } = require('../repositories/UserRepository');
 const { RecoveryRepository } = require('../repositories/RecoveryRepository');
+const { SimulatedRepository } = require('../repositories/SimulatedRepository');
+const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
+const simulatedRepository = new SimulatedRepository();
+const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
 
 const {
@@ -11,6 +15,7 @@ const {
     passwordEdit,
     clearUserObject,
     verifyDuplicatedEmailWithoutMe,
+    formatInPercentage,
 } = require('../helpers/utils');
 
 const { encryptPassword } = require('../helpers/handlePassword');
@@ -285,6 +290,37 @@ async function reportProblem(request, response) {
     });
 }
 
+async function performanceUser(request, response) {
+    const { id: userId } = request.params;
+
+    const totalSimulateds = await simulatedRepository.count({ userId });
+
+    const totalQuestionsAnswered = await simulatedSortQuestionsRepository
+        .count({ userId, answered: true });
+
+    const totalQuestionsDatabase = await questionRepository.count();
+
+    const percentageAnswered = formatInPercentage(totalQuestionsAnswered / totalQuestionsDatabase);
+
+    const questionsAnswered = await simulatedSortQuestionsRepository
+        .findBy({ userId, answered: true });
+
+    let totalHits = 0;
+    for (const { questionId } of questionsAnswered) {
+        const alternativeCorrect = await questionRepository
+            .getAlternativeCorrectOfQuestion(questionId);
+
+        totalHits += Number(await questionRepository
+        .getTotalAnsweredSuchAlternative(questionId, alternativeCorrect.id, userId));
+    }
+
+    const percentageHits = formatInPercentage(totalHits / totalQuestionsAnswered);
+
+    console.log(totalHits, 'hits', totalQuestionsAnswered);
+
+    return response.status(200).json({ totalSimulateds, percentageAnswered, percentageHits });
+}
+
 module.exports = {
     getUser,
     listUsers,
@@ -295,4 +331,5 @@ module.exports = {
     redefinePassword,
     reportProblem,
     listUserPaginated,
+    performanceUser,
 };
