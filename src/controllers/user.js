@@ -11,6 +11,7 @@ const {
     passwordEdit,
     clearUserObject,
     verifyDuplicatedEmailWithoutMe,
+    clearTop3,
 } = require('../helpers/utils');
 
 const { encryptPassword } = require('../helpers/handlePassword');
@@ -279,17 +280,21 @@ async function reportProblem(request, response) {
 async function top3Hits(request, response) {
     const { id: userId } = request.params;
 
-    const top3 = await categoryRepository.top3AnsweredCorrectly(userId);
+    const top3categories = await categoryRepository.top3AnsweredCorrectly(userId);
 
-    return response.status(200).json(top3);
+    const top3Filtered = clearTop3(top3categories);
+
+    return response.status(200).json(top3Filtered);
 }
 
 async function top3AnsweredIncorrectly(request, response) {
     const { id: userId } = request.params;
 
-    const top3 = await categoryRepository.top3AnsweredIncorrectly(userId);
+    const top3categories = await categoryRepository.top3AnsweredIncorrectly(userId);
 
-    return response.status(200).json(top3);
+    const top3Filtered = clearTop3(top3categories);
+
+    return response.status(200).json(top3Filtered);
 }
 
 module.exports = {
