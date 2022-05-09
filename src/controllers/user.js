@@ -319,8 +319,6 @@ async function performanceUser(request, response) {
 
     const percentageHits = formatInPercentage(totalHits / totalQuestionsAnswered);
 
-    console.log(totalHits, 'hits', totalQuestionsAnswered);
-
     return response.status(200).json({ totalSimulateds, percentageAnswered, percentageHits });
 }
 
