@@ -34,7 +34,8 @@ class UserRepository extends BaseRepository {
             .where({
                 'users.userType': 'student',
                 'users.active': true,
-           }).limit(size)
+           })
+            .limit(size)
             .offset(page)
             .returning('*');
 
