@@ -3,12 +3,14 @@ const { RecoveryRepository } = require('../repositories/RecoveryRepository');
 const { SimulatedRepository } = require('../repositories/SimulatedRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 const { QuestionRepository } = require('../repositories/QuestionRepository');
+const { CategoryRepository } = require('../repositories/CategoryRepository');
 
 const userRepository = new UserRepository();
 const recoveryRepository = new RecoveryRepository();
 const simulatedRepository = new SimulatedRepository();
 const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
+const categoryRepository = new CategoryRepository();
 
 const {
     verifyDuplicatedEmail,
@@ -16,6 +18,7 @@ const {
     clearUserObject,
     verifyDuplicatedEmailWithoutMe,
     formatInPercentage,
+    clearTop3,
 } = require('../helpers/utils');
 
 const { encryptPassword } = require('../helpers/handlePassword');
@@ -321,6 +324,26 @@ async function performanceUser(request, response) {
     return response.status(200).json({ totalSimulateds, percentageAnswered, percentageHits });
 }
 
+async function top3Hits(request, response) {
+    const { id: userId } = request.params;
+
+    const top3categories = await categoryRepository.top3AnsweredCorrectly(userId);
+
+    const top3Filtered = clearTop3(top3categories);
+
+    return response.status(200).json(top3Filtered);
+}
+
+async function top3AnsweredIncorrectly(request, response) {
+    const { id: userId } = request.params;
+
+    const top3categories = await categoryRepository.top3AnsweredIncorrectly(userId);
+
+    const top3Filtered = clearTop3(top3categories);
+
+    return response.status(200).json(top3Filtered);
+}
+
 module.exports = {
     getUser,
     listUsers,
@@ -332,4 +355,6 @@ module.exports = {
     reportProblem,
     listUserPaginated,
     performanceUser,
+    top3Hits,
+    top3AnsweredIncorrectly,
 };

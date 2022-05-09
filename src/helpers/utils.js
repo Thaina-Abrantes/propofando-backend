@@ -120,6 +120,7 @@ async function sortedQuestions(
       simulatedId: registeredSimulated.id,
       userId,
       questionId: allQuestionRepository[indexQuestionSorted].id,
+      categoryId: allQuestionRepository[indexQuestionSorted].categoryId,
     });
 
     questionsSorted.push(questionSorted);
@@ -132,6 +133,14 @@ function formatInPercentage(number) {
  return `${Math.ceil(number * 100)}%`;
 }
 
+function clearTop3(categories) {
+  const categoriesFiltered = categories.filter((category) => (category.totalhits
+    ? category.totalhits > 0
+    : category.totalincorrects > 0));
+
+  return categoriesFiltered;
+}
+
 module.exports = {
   verifyDuplicatedEmail,
   clearUserObject,
@@ -142,4 +151,5 @@ module.exports = {
   getRandomInt,
   sortedQuestions,
   formatInPercentage,
+  clearTop3,
 };
