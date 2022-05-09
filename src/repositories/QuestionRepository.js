@@ -76,6 +76,56 @@ class QuestionRepository extends BaseRepository {
         return questions;
     }
 
+    async answeredQuestionCorrectly(pageNumber, size) {
+        pageNumber = pageNumber || 1;
+        size = size || 6;
+
+        const rowCount = await knex('users').count('*').where({
+        'users.userType': 'student',
+        'users.active': true,
+        });
+
+        const { count } = rowCount[0];
+
+        const numberOfPages = Math.ceil(count / size);
+
+        const page = (pageNumber - 1) * size;
+        const questionAnsweredCorrectly = await knex('users as u')
+        .leftJoin('simulated as s', 's.userId', 'u.id')
+        .leftJoin('questions_sort_simulated as qss', 'qss.simulatedId', 's.id')
+        .leftJoin('alternatives as a', 'a.questionId', 'qss.questionId')
+        .select(
+            'u.id',
+            'u.name',
+            'u.email',
+            'u.active',
+            'u.userType',
+            knex.raw('count(*) filter(where qss."altenativeId"= a.id and a.correct = true) as corrects'),
+        )
+        .where({
+            'u.userType': 'student',
+            'u.active': true,
+        })
+        .groupBy('u.id', 'qss.userId')
+        .limit(size)
+        .offset(page)
+        .returning('*');
+
+        questionAnsweredCorrectly.totalItems = count;
+        questionAnsweredCorrectly.totalPages = numberOfPages >= 1 ? numberOfPages : 1;
+        questionAnsweredCorrectly.currentPage = parseInt(pageNumber, 10);
+
+        return questionAnsweredCorrectly;
+    }
+
+    async getAllQuestions() {
+        const totalQuestions = await knex('questions').count('*');
+
+        const { count: numberOfquestions } = totalQuestions[0];
+
+        return numberOfquestions;
+}
+
     async getTotalUsersAnswered(id) {
         const totalUsersAnswered = await knex('questions_sort_simulated as qsimulated')
             .leftJoin('questions as q', 'q.id', 'qsimulated.questionId')
