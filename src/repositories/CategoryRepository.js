@@ -39,10 +39,10 @@ class CategoryRepository extends BaseRepository {
 
     async getCategoryStatistics() {
         const categoryStatistics = await knex('users as u')
-        .leftjoin('questions_sort_simulated as qss', 'qss.userId', 'u.id')
-        .leftjoin('questions as q', 'q.id', 'qss.questionId')
-        .leftjoin('category as c', 'c.id', 'q.categoryId')
-        .leftjoin('alternatives as a', 'a.id', 'qss.altenativeId')
+        .leftJoin('questions_sort_simulated as qss', 'qss.userId', 'u.id')
+        .leftJoin('questions as q', 'q.id', 'qss.questionId')
+        .leftJoin('category as c', 'c.id', 'q.categoryId')
+        .leftJoin('alternatives as a', 'a.id', 'qss.altenativeId')
         .select(
             'u.id',
             'u.name',
@@ -54,7 +54,8 @@ class CategoryRepository extends BaseRepository {
             'u.active': true,
             'u.userType': 'student',
         })
-        .groupBy('c.id', 'u.id');
+        .groupBy('c.name', 'u.id')
+        .debug();
 
        return categoryStatistics;
     }
