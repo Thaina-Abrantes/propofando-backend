@@ -37,23 +37,22 @@ async function listCategoriesPaginated(request, response) {
 
     const categories = await categoryRepository.getCategories(page, size);
 
-    for(const category of categories) {
+    for (const category of categories) {
         const { id } = category;
-
-        const questionsAssociateds = await questionRepository.findBy({categoryId: id});
+        const questionsAssociateds = await questionRepository.findBy({ categoryId: id });
 
         category.totalQuestions = questionsAssociateds.length;
     }
 
     const totalCategories = categories.totalItems;
-    const totalPages = categories.totalPages;
-    const currentPage = categories.currentPage;
+    const { totalPages } = categories;
+    const { currentPage } = categories;
 
     return response.status(200).json({
         totalCategories,
-        categories, 
-        totalPages, 
-        currentPage
+        categories,
+        totalPages,
+        currentPage,
     });
 }
 
@@ -63,7 +62,7 @@ async function getCategory(request, response) {
     const category = await categoryRepository.findOneBy({ id });
 
     if (!category) {
-        return response.status(404).json({ message: "Categoria não encontrada." });
+        return response.status(404).json({ message: 'Categoria não encontrada.' });
     }
 
     const cleanedCategory = clearCategoryObject(category);
@@ -77,13 +76,17 @@ async function deleteCategory(request, response) {
     const category = await categoryRepository.findOneBy({ id });
 
     if (!category) {
-        return response.status(404).json({ message: "Categoria não encontrada." });
+        return response.status(404).json({ message: 'Categoria não encontrada.' });
     }
+    const questionsAssociateds = await questionRepository.findBy({ categoryId: id });
 
+    if (questionsAssociateds.length > 0) {
+        return response.status(400).json({ message: 'Não é possível deletar categorias com questões cadastradas!' });
+    }
     const deletedCategory = await categoryRepository.delete(id);
 
     if (!deletedCategory) {
-        return response.status(400).json({ message: "Erro ao deletar categoria." });
+        return response.status(400).json({ message: 'Erro ao deletar categoria.' });
     }
 
     return response.status(200).json({ message: 'Categoria deletada com sucesso.' });
@@ -98,27 +101,27 @@ async function updateCategory(request, response) {
     if (!registeredCategory.success) {
         return response.status(400).json({ message: registeredCategory.message });
     }
-    
+
     const category = await categoryRepository.findOneBy({ id });
 
     if (!category) {
-        return response.status(404).json({ message: "Categoria não encontrada." });
+        return response.status(404).json({ message: 'Categoria não encontrada.' });
     }
 
     const updatedCategory = await categoryRepository.update({ id, name });
 
     if (!updatedCategory) {
-        return response.status(400).json({ message: "Erro ao atualizar categoria." });
+        return response.status(400).json({ message: 'Erro ao atualizar categoria.' });
     }
 
     return response.status(200).json({ message: 'Categoria atualizada com sucesso.' });
 }
 
-module.exports = { 
-    createCategory, 
-    listCategories, 
+module.exports = {
+    createCategory,
+    listCategories,
     listCategoriesPaginated,
-    getCategory, 
-    deleteCategory, 
-    updateCategory
-}
+    getCategory,
+    deleteCategory,
+    updateCategory,
+};
