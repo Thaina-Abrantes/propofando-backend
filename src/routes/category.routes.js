@@ -1,12 +1,13 @@
 const { Router } = require('express');
 
-const { 
+const {
     createCategory,
     listCategories,
     listCategoriesPaginated,
     getCategory,
     deleteCategory,
     updateCategory,
+    getStatisticsCategories,
  } = require('../controllers/category');
 
 const { validateBody, validateParams } = require('../middlewares/validateRequest');
@@ -25,6 +26,14 @@ routes.get(
     listCategoriesPaginated,
 );
 
+routes.get(
+    '/categories/statistics/:id',
+    authentication,
+    validateAccessPermission(['super admin', 'student']),
+    validateParams(validateUuidSchema),
+    getStatisticsCategories,
+
+);
 routes.get(
     '/categories/:id',
     authentication,

@@ -7,6 +7,7 @@ const alternativeRepository = new AlternativeRepository();
 const categoryRepository = new CategoryRepository();
 
 const { generateTransaction } = require('../helpers/handleTransaction');
+const { formatInPercentage } = require('../helpers/utils');
 
 async function getQuestion(request, response) {
     const { id } = request.params;
@@ -229,14 +230,14 @@ async function getStatistics(request, response) {
 
     const totalUsersAnswers = await questionRepository.getTotalUsersAnswered(id);
 
-    const percentageGeneralHits = `${(answeredCorrectly / totalUsersAnswers).toFixed(2) * 100}%`;
+    const percentageGeneralHits = formatInPercentage(answeredCorrectly / totalUsersAnswers);
 
     const alternativesOfQuestion = await questionRepository.getAlternativesQuestion(id);
 
     for (const alternative of alternativesOfQuestion) {
         const answeredCorrect = await questionRepository
             .getTotalAnsweredSuchAlternative(id, alternative.id);
-        alternative.percentageSelectedThis = `${(answeredCorrect / totalUsersAnswers).toFixed(2) * 100}%`;
+        alternative.percentageSelectedThis = formatInPercentage(answeredCorrect / totalUsersAnswers);
 
         delete alternative.createdAt;
         delete alternative.updatedAt;

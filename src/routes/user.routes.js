@@ -10,6 +10,7 @@ const {
     redefinePassword,
     reportProblem,
     listUserPaginated,
+    performanceUser,
     top3Hits,
     top3AnsweredIncorrectly,
  } = require('../controllers/user');
@@ -69,6 +70,15 @@ routes.get(
     authentication,
     validateAccessPermission(['super admin']),
     listUsers,
+);
+
+routes.get(
+    '/users/:id/performance',
+    authentication,
+    validateAccessPermission(['student']),
+    validateParams(validateUuidSchema),
+    performanceUser,
+
 );
 
 routes.post(
