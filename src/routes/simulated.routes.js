@@ -2,6 +2,7 @@ const { Router } = require('express');
 
 const {
   createSimulated,
+  answerSimulated,
   consultAnswers,
   listSimulated,
 } = require('../controllers/simulated');
@@ -27,6 +28,11 @@ routes.get(
 routes.post(
   '/simulated',
   createSimulated,
+);
+
+routes.patch(
+  '/simulated',
+  answerSimulated,
 );
 
 routes.get(
