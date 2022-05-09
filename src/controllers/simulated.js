@@ -77,7 +77,27 @@ async function listSimulated(request, response) {
   return response.status(201).json(simuladosUser);
 }
 
-// Feat: Criar controler para inserir resposta
+async function answerSimulated(request, response) {
+  const { id, altenativeId } = request.body;
+
+  const shortQuestionExits = await simulatedSortQuestionsRepository.findOneBy(
+    { id },
+  );
+
+  if (!shortQuestionExits) {
+    return response.status(400).json({ message: 'Questão não encontrada' });
+  }
+
+  const simulatedAnswer = await simulatedSortQuestionsRepository.update({
+    id, altenativeId, answered: true,
+  });
+
+  if (!simulatedAnswer) {
+    return response.status(400).json({ message: 'Não foi possivel responder a questão' });
+  }
+
+  return response.status(201).json({ message: 'Questão respondida' });
+}
 
 async function consultAnswers(request, response) {
   const { id } = request.params;
@@ -109,6 +129,7 @@ async function consultAnswers(request, response) {
 
 module.exports = {
   createSimulated,
+  answerSimulated,
   consultAnswers,
   listSimulated,
 };
