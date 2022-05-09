@@ -39,6 +39,7 @@ async function createSimulated(request, response) {
     (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionRepository.length)
     || (quantityQuestions > allQuestionRepository.length)
   ) {
+    await simulatedRepository.delete(registeredSimulated.id);
     return response.status(400).json({ message: 'Sem questões disponiveis' });
   }
 
@@ -61,6 +62,7 @@ async function createSimulated(request, response) {
   }
 
   if (!registerSimulatedQuestions) {
+    await simulatedRepository.delete({ id: registeredSimulated.id });
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
 
