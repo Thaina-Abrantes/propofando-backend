@@ -54,10 +54,18 @@ class CategoryRepository extends BaseRepository {
             'u.active': true,
             'u.userType': 'student',
         })
-        .groupBy('c.name', 'u.id')
-        .debug();
+        .groupBy('c.id', 'u.id');
 
        return categoryStatistics;
+    }
+
+    async numberOfQuestionPerCategory() {
+        const questionsOfCategory = await knex('category as c')
+        .leftJoin('questions as q', 'q.categoryId', 'c.id')
+        .select('c.name').count('*')
+        .groupBy('c.id');
+
+        return questionsOfCategory;
     }
 }
 module.exports = { CategoryRepository };
