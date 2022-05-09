@@ -117,6 +117,29 @@ async function updateCategory(request, response) {
     return response.status(200).json({ message: 'Categoria atualizada com sucesso.' });
 }
 
+async function getStatisticsCategories(request, response) {
+    const { id } = request.params;
+
+    const statistics = await categoryRepository.getCategoryStatistics();
+    const questionOfCategory = await categoryRepository.numberOfQuestionPerCategory();
+
+    for (const item of statistics) {
+        for (let i = 0; i < questionOfCategory.length; i += 1) {
+            if (item.name === questionOfCategory[i].name) {
+                item.numberOfQuestionOfCategory = questionOfCategory[i].count;
+            }
+        }
+    }
+
+    const result = statistics.filter((e) => e.id === id);
+
+    if (!result) {
+        response.status(400).json({ message: 'Ainda não há dados de desempenho disponíveis' });
+    }
+
+    return response.status(200).json(result);
+}
+
 module.exports = {
     createCategory,
     listCategories,
@@ -124,4 +147,5 @@ module.exports = {
     getCategory,
     deleteCategory,
     updateCategory,
+    getStatisticsCategories,
 };
