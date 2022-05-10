@@ -131,8 +131,7 @@ async function consultAnswers(request, response) {
 
 async function getRandomQuestions(request, response) {
   const { simulatedId, userId } = request.params;
-  console.log(simulatedId);
-  console.log(userId);
+
   const questions = await simulatedRepository.listRandomQuestions(simulatedId, userId);
 
   if (!questions) {
