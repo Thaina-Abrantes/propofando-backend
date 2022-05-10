@@ -130,7 +130,7 @@ async function sortedQuestions(
 }
 
 function formatInPercentage(number) {
- return `${Math.ceil(number * 100)}%`;
+ return number ? `${Math.ceil(number * 100)}%` : `${0}%`;
 }
 
 function clearTop3(categories) {
