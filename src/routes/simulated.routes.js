@@ -6,6 +6,7 @@ const {
   consultAnswers,
   listSimulated,
   getRandomQuestions,
+  finishSimulated,
 } = require('../controllers/simulated');
 
 const { validateParams } = require('../middlewares/validateRequest');
@@ -36,6 +37,11 @@ routes.get(
 routes.post(
   '/simulated',
   createSimulated,
+);
+
+routes.patch(
+  '/simulated/finish',
+  finishSimulated,
 );
 
 routes.patch(

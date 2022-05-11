@@ -101,8 +101,11 @@ async function sortedQuestions(
       { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
     );
 
+    console.log(allQuestionRepository);
+
     if (questionSortedExists) {
       newSorted = true;
+
       while (newSorted) {
         indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
 
