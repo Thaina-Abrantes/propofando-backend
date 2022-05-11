@@ -18,18 +18,17 @@ async function createSimulated(request, response) {
 
   let questionsSorted = [];
 
-  // Refactor: Melhorar nome do simulado ()
-  if (!name) {
-    name = `Simulado ${userId}`;
-  }
-
   // Refactor: Trazer apenas questões diponiveis do usuario
   // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
-  const allQuestionRepository = await questionRepository.findAll();
-
   const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
     { userId },
   );
+
+  if (!name) {
+    name = `Simulado ${allSimulatedSortUser.length}`;
+  }
+
+  const allQuestionRepository = await questionRepository.findAll();
 
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });

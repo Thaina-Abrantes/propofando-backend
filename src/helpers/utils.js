@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { UserRepository } = require('../repositories/UserRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
@@ -130,7 +131,7 @@ async function sortedQuestions(
 }
 
 function formatInPercentage(number) {
- return number ? `${Math.ceil(number * 100)}%` : `${0}%`;
+  return number ? `${Math.ceil(number * 100)}%` : `${0}%`;
 }
 
 function clearTop3(categories) {
