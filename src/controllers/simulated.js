@@ -18,26 +18,39 @@ async function createSimulated(request, response) {
 
   let questionsSorted = [];
 
-  // Refactor: Melhorar nome do simulado ()
-  if (!name) {
-    name = `Simulado ${userId}`;
-  }
-
   // Refactor: Trazer apenas questões diponiveis do usuario
   // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
-  const allQuestionRepository = await questionRepository.findAll();
-
   const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
     { userId },
   );
+
+  const simuladoActive = await simulatedRepository.findBy(
+    { userId, active: true },
+  );
+
+  if (simuladoActive.length >= 1) {
+    return response.status(400).json({ message: 'Existe um simulado ativo' });
+  }
+
+  if (!name) {
+    name = `Simulado ${allSimulatedSortUser.length}`;
+  }
+
+  const allQuestionRepository = await questionRepository.findAll();
 
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });
 
   // Refactor: melhorar comparativo de questões disponiveis
+  const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
+  console.log('totalQuestions', totalQuestions);
+  console.log('allSimulatedSortUser', allSimulatedSortUser.length);
+  console.log('quantityQuestions', quantityQuestions);
+  console.log('allQuestionRepository.length', allQuestionRepository.length);
   if (
     (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionRepository.length)
     || (quantityQuestions > allQuestionRepository.length)
+    || (totalQuestions > allQuestionRepository.length)
   ) {
     await simulatedRepository.delete(registeredSimulated.id);
     return response.status(400).json({ message: 'Sem questões disponiveis' });
@@ -141,10 +154,26 @@ async function getRandomQuestions(request, response) {
   response.status(200).json(questions);
 }
 
+async function finishSimulated(request, response) {
+  // refact: verificar se as questões foram respondidas, caso não retornar para a base de dados.
+  const { simulatedId } = request.body;
+
+  const simulated = await simulatedRepository.update(
+    { id: simulatedId, active: false },
+  );
+
+  if (!simulated) {
+    return response.status(400).json({ message: 'Não foi possivel finalizar o simulado' });
+  }
+
+  return response.status(200).json({ message: 'Simulado finalizado' });
+}
+
 module.exports = {
   createSimulated,
   answerSimulated,
   consultAnswers,
   listSimulated,
   getRandomQuestions,
+  finishSimulated,
 };
