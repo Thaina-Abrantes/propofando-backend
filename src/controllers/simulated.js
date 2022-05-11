@@ -4,10 +4,6 @@ const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedS
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { sortedQuestions } = require('../helpers/utils');
 
-/*  Feat: Responder simulado
-const { AlternativeRepository } = require('../repositories/AlternativeRepository');
-const alternativeRepository = new AlternativeRepository(); */
-
 const simulatedRepository = new SimulatedRepository();
 const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
@@ -41,12 +37,8 @@ async function createSimulated(request, response) {
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });
 
-  // Refactor: melhorar comparativo de questões disponiveis
   const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
-  console.log('totalQuestions', totalQuestions);
-  console.log('allSimulatedSortUser', allSimulatedSortUser.length);
-  console.log('quantityQuestions', quantityQuestions);
-  console.log('allQuestionRepository.length', allQuestionRepository.length);
+
   if (
     (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionRepository.length)
     || (quantityQuestions > allQuestionRepository.length)
@@ -56,7 +48,6 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Sem questões disponiveis' });
   }
 
-  // Refactor: Não realizar o sorteio quando a quantidade for inferior as questões diponiveis.
   // Feat: Aplicar sorteio por proporções de categorias disponiveis
   questionsSorted = await sortedQuestions(
     name,
