@@ -70,7 +70,7 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
 
-  return response.status(201).json({ message: 'Simulado criado com sucesso.' });
+  return response.status(201).json(registeredSimulated);
 }
 
 async function listSimulated(request, response) {
