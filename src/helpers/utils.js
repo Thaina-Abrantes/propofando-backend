@@ -101,8 +101,7 @@ async function sortedQuestions(
       { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
     );
 
-    console.log(allQuestionRepository);
-
+    /** Refatora */
     if (questionSortedExists) {
       newSorted = true;
 
