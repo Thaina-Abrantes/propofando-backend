@@ -128,9 +128,22 @@ async function consultAnswers(request, response) {
   return response.status(200).json(answers);
 }
 
+async function getRandomQuestions(request, response) {
+  const { simulatedId, userId } = request.params;
+
+  const questions = await simulatedRepository.listRandomQuestions(simulatedId, userId);
+
+  if (!questions) {
+    return response.status(400).json({ message: 'Questões não encontradas' });
+  }
+
+  response.status(200).json(questions);
+}
+
 module.exports = {
   createSimulated,
   answerSimulated,
   consultAnswers,
   listSimulated,
+  getRandomQuestions,
 };

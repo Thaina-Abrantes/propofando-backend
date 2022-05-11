@@ -9,6 +9,14 @@ const validateUuidSchema = yup.object().shape({
     .uuid()
     .required(),
 });
+const validateUuidSchemaListQuestions = yup.object().shape({
+  simulatedId: yup.string()
+    .uuid()
+    .required(),
+  userId: yup.string()
+  .uuid()
+  .required(),
+});
 
 const paginatedSchema = yup.object().shape({
   page: yup.number().positive(),
@@ -25,4 +33,5 @@ module.exports = {
   validateUuidSchema,
   paginatedSchema,
   reportProblemSchema,
+  validateUuidSchemaListQuestions,
 };
