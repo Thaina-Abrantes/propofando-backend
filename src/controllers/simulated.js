@@ -4,10 +4,6 @@ const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedS
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { sortedQuestions } = require('../helpers/utils');
 
-/*  Feat: Responder simulado
-const { AlternativeRepository } = require('../repositories/AlternativeRepository');
-const alternativeRepository = new AlternativeRepository(); */
-
 const simulatedRepository = new SimulatedRepository();
 const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
@@ -18,32 +14,40 @@ async function createSimulated(request, response) {
 
   let questionsSorted = [];
 
-  // Refactor: Melhorar nome do simulado ()
-  if (!name) {
-    name = `Simulado ${userId}`;
-  }
-
   // Refactor: Trazer apenas questões diponiveis do usuario
   // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
-  const allQuestionRepository = await questionRepository.findAll();
-
   const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
     { userId },
   );
 
+  const simuladoActive = await simulatedRepository.findBy(
+    { userId, active: true },
+  );
+
+  if (simuladoActive.length >= 1) {
+    return response.status(400).json({ message: 'Existe um simulado ativo' });
+  }
+
+  if (!name) {
+    name = `Simulado ${allSimulatedSortUser.length}`;
+  }
+
+  const allQuestionRepository = await questionRepository.findAll();
+
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });
 
-  // Refactor: melhorar comparativo de questões disponiveis
+  const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
+
   if (
     (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionRepository.length)
     || (quantityQuestions > allQuestionRepository.length)
+    || (totalQuestions > allQuestionRepository.length)
   ) {
     await simulatedRepository.delete(registeredSimulated.id);
     return response.status(400).json({ message: 'Sem questões disponiveis' });
   }
 
-  // Refactor: Não realizar o sorteio quando a quantidade for inferior as questões diponiveis.
   // Feat: Aplicar sorteio por proporções de categorias disponiveis
   questionsSorted = await sortedQuestions(
     name,
@@ -66,7 +70,7 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
 
-  return response.status(201).json({ message: 'Simulado criado com sucesso.' });
+  return response.status(201).json(registeredSimulated);
 }
 
 async function listSimulated(request, response) {
@@ -129,9 +133,38 @@ async function consultAnswers(request, response) {
   return response.status(200).json(answers);
 }
 
+async function getRandomQuestions(request, response) {
+  const { simulatedId, userId } = request.params;
+
+  const questions = await simulatedRepository.listRandomQuestions(simulatedId, userId);
+
+  if (!questions) {
+    return response.status(400).json({ message: 'Questões não encontradas' });
+  }
+
+  response.status(200).json(questions);
+}
+
+async function finishSimulated(request, response) {
+  // refact: verificar se as questões foram respondidas, caso não retornar para a base de dados.
+  const { simulatedId } = request.body;
+
+  const simulated = await simulatedRepository.update(
+    { id: simulatedId, active: false },
+  );
+
+  if (!simulated) {
+    return response.status(400).json({ message: 'Não foi possivel finalizar o simulado' });
+  }
+
+  return response.status(200).json({ message: 'Simulado finalizado' });
+}
+
 module.exports = {
   createSimulated,
   answerSimulated,
   consultAnswers,
   listSimulated,
+  getRandomQuestions,
+  finishSimulated,
 };

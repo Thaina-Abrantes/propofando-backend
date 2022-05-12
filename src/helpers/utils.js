@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { UserRepository } = require('../repositories/UserRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
@@ -100,8 +101,10 @@ async function sortedQuestions(
       { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
     );
 
+    /** Refatora */
     if (questionSortedExists) {
       newSorted = true;
+
       while (newSorted) {
         indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
 
@@ -120,6 +123,7 @@ async function sortedQuestions(
       simulatedId: registeredSimulated.id,
       userId,
       questionId: allQuestionRepository[indexQuestionSorted].id,
+      categoryId: allQuestionRepository[indexQuestionSorted].categoryId,
     });
 
     questionsSorted.push(questionSorted);
@@ -129,7 +133,15 @@ async function sortedQuestions(
 }
 
 function formatInPercentage(number) {
- return `${Math.ceil(number * 100)}%`;
+  return number ? `${Math.ceil(number * 100)}%` : `${0}%`;
+}
+
+function clearTop3(categories) {
+  const categoriesFiltered = categories.filter((category) => (category.totalhits
+    ? category.totalhits > 0
+    : category.totalincorrects > 0));
+
+  return categoriesFiltered;
 }
 
 module.exports = {
@@ -142,4 +154,5 @@ module.exports = {
   getRandomInt,
   sortedQuestions,
   formatInPercentage,
+  clearTop3,
 };

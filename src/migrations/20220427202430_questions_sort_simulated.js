@@ -5,7 +5,7 @@ exports.up = async function (knex) {
     table.string('name').notNullable();
     table.uuid('simulatedId').notNullable();
     table.uuid('userId').notNullable();
-    table.uuid('altenativeId').notNullable();
+    table.uuid('altenativeId');
     table.uuid('questionId').notNullable();
     table.boolean('answered').defaultTo(false);
     table.foreign('userId').references('id').inTable('users');
