@@ -63,7 +63,7 @@ class QuestionRepository extends BaseRepository {
                     builder.where('q.categoryId', category);
                 }
             })
-            .orderBy('q.title')
+            .orderBy('q.createdAt', 'desc')
             .groupBy('q.id')
             .limit(size)
             .offset(page)
