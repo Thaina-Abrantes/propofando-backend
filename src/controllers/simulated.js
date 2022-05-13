@@ -9,13 +9,14 @@ const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
 
 async function createSimulated(request, response) {
-  const { userId, quantityQuestions } = request.body;
-  let { name } = request.body;
+  const { name, userId, quantityQuestions } = request.body;
 
   let questionsSorted = [];
 
   // Refactor: Trazer apenas questões diponiveis do usuario
   // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
+  const allQuestionRepository = await questionRepository.findAll();
+
   const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
     { userId },
   );
@@ -27,12 +28,6 @@ async function createSimulated(request, response) {
   if (simuladoActive.length >= 1) {
     return response.status(400).json({ message: 'Existe um simulado ativo' });
   }
-
-  if (!name) {
-    name = `Simulado ${allSimulatedSortUser.length}`;
-  }
-
-  const allQuestionRepository = await questionRepository.findAll();
 
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });
@@ -48,19 +43,19 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Sem questões disponiveis' });
   }
 
-  // Feat: Aplicar sorteio por proporções de categorias disponiveis
+  // Feat: Aplicar sorteio com as questões disponiveis
   questionsSorted = await sortedQuestions(
     name,
     registeredSimulated,
     quantityQuestions,
-    allQuestionRepository,
+    allQuestionRepository, // aqui ficará somente as questões disponiveis
     userId,
   );
 
   const registerSimulatedQuestions = await simulatedSortQuestionsRepository
     .insertAll(questionsSorted);
 
-  // Refactor: Melhorar validações
+  // Refactor: Melhorar validações se necessesário
   if (!registeredSimulated) {
     return response.status(400).json({ message: 'Não foi possível criar o simulado.' });
   }
@@ -70,7 +65,7 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
 
-  return response.status(201).json({ message: 'Simulado criado com sucesso.' });
+  return response.status(201).json(registeredSimulated);
 }
 
 async function listSimulated(request, response) {

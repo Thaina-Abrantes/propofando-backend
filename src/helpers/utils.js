@@ -101,7 +101,7 @@ async function sortedQuestions(
       { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
     );
 
-    /** Refatora */
+    /** Refatorar (Esse código será excluido após passa somente as questões disponiveis) */
     if (questionSortedExists) {
       newSorted = true;
 
@@ -117,6 +117,7 @@ async function sortedQuestions(
         }
       }
     }
+    /** Refatorar */
 
     Object.assign(questionSorted, {
       name,
@@ -126,6 +127,7 @@ async function sortedQuestions(
       categoryId: allQuestionRepository[indexQuestionSorted].categoryId,
     });
 
+    // verificar se não existe questões duplicada antes de efetuar o push
     questionsSorted.push(questionSorted);
   }
 
