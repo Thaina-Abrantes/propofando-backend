@@ -23,7 +23,7 @@ class QuestionRepository extends BaseRepository {
             )
             .where('q.id', id)
             .groupBy('q.id')
-            .returning('*');
+            .first();
 
         return question;
     }

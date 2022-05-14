@@ -271,7 +271,7 @@ async function reportProblem(request, response) {
 
     const question = await questionRepository.getQuestion(questionId);
 
-    if (!question.length) {
+    if (!question) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
@@ -284,7 +284,7 @@ async function reportProblem(request, response) {
             user: name,
             descriptionProblem: description,
             emailContact: process.env.EMAIL_PROPOFANDO,
-            questionTitle: question[0].title,
+            questionTitle: question.title,
         },
     };
 
