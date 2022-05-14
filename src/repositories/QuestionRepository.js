@@ -50,6 +50,7 @@ class QuestionRepository extends BaseRepository {
             .leftJoin('alternatives as a', 'a.questionId', 'q.id')
             .select(
                 'q.id',
+                'q.createdAt',
                 'q.title',
                 'q.description',
                 'q.categoryId',
