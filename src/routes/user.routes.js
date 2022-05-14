@@ -120,7 +120,7 @@ routes.post(
 );
 
 routes.post(
-    '/users/report-problem',
+    '/users/report-problem/question/:id',
     authentication,
     validateAccessPermission(['student']),
     validateBody(reportProblemSchema),

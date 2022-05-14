@@ -267,6 +267,13 @@ async function redefinePassword(request, response) {
 async function reportProblem(request, response) {
     const { description } = request.body;
     const { name, email } = request.user;
+    const { id: questionId } = request.params;
+
+    const question = await questionRepository.getQuestion(questionId);
+
+    if (!question.length) {
+        return response.status(404).json({ message: 'Questão não encontrada.' });
+    }
 
     const mailOptions = {
         from: `${name} <${email}>`,
@@ -277,6 +284,7 @@ async function reportProblem(request, response) {
             user: name,
             descriptionProblem: description,
             emailContact: process.env.EMAIL_PROPOFANDO,
+            questionTitle: question[0].title,
         },
     };
 
