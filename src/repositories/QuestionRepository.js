@@ -23,7 +23,7 @@ class QuestionRepository extends BaseRepository {
             )
             .where('q.id', id)
             .groupBy('q.id')
-            .returning('*');
+            .first();
 
         return question;
     }
@@ -50,6 +50,7 @@ class QuestionRepository extends BaseRepository {
             .leftJoin('alternatives as a', 'a.questionId', 'q.id')
             .select(
                 'q.id',
+                'q.createdAt',
                 'q.title',
                 'q.description',
                 'q.categoryId',
@@ -63,7 +64,7 @@ class QuestionRepository extends BaseRepository {
                     builder.where('q.categoryId', category);
                 }
             })
-            .orderBy('q.title')
+            .orderBy('q.createdAt', 'desc')
             .groupBy('q.id')
             .limit(size)
             .offset(page)

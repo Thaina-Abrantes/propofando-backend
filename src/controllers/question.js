@@ -14,11 +14,11 @@ async function getQuestion(request, response) {
 
     const question = await questionRepository.getQuestion(id);
 
-    if (!question.length) {
+    if (!question) {
         return response.status(404).json({ message: 'Questão não encontrada.' });
     }
 
-    let { alternatives } = question[0];
+    let { alternatives } = question;
     const alternativesOrdened = alternatives.sort((a, b) => {
         if (a.option > b.option) {
             return 1;
@@ -28,7 +28,7 @@ async function getQuestion(request, response) {
 
     alternatives = alternativesOrdened;
 
-    return response.status(200).json(question[0]);
+    return response.status(200).json(question);
 }
 
 async function listQuestions(request, response) {
