@@ -120,14 +120,14 @@ async function consultAnswers(request, response) {
 
     const question = await questionRepository.getQuestion(questionId);
 
-    for (const alternative of question[0].alternatives) {
+    for (const alternative of question.alternatives) {
       alternative.isUserAnswer = false;
       if (altenativeId === alternative.id && answered) {
         alternative.isUserAnswer = true;
       }
     }
 
-    answers.push(question[0]);
+    answers.push(question);
   }
 
   return response.status(200).json(answers);
