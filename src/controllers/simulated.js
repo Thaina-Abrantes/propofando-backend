@@ -12,14 +12,6 @@ async function createSimulated(request, response) {
   const { userId, quantityQuestions } = request.body;
   let { name } = request.body;
 
-  let questionsSorted = [];
-
-  // Refactor: Trazer apenas questões diponiveis do usuario
-  // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
-  const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
-    { userId },
-  );
-
   const simuladoActive = await simulatedRepository.findBy(
     { userId, active: true },
   );
@@ -28,11 +20,20 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Existe um simulado ativo' });
   }
 
+  const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
+    { userId },
+  );
+
   if (!name) {
     name = `Simulado ${allSimulatedSortUser.length}`;
   }
 
-  const allQuestionRepository = await questionRepository.findAll();
+  // Refactor: Trazer apenas questões diponiveis do usuario
+  // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
+
+  const allQuestionRepository = await questionRepository.getQuestionsAvailable(userId);
+  console.log(allQuestionRepository, 'ques');
+  return response.status(200).json(allQuestionRepository);
 
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });
@@ -49,6 +50,7 @@ async function createSimulated(request, response) {
   }
 
   // Feat: Aplicar sorteio por proporções de categorias disponiveis
+  let questionsSorted = [];
   questionsSorted = await sortedQuestions(
     name,
     registeredSimulated,
