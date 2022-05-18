@@ -9,11 +9,12 @@ const {
   finishSimulated,
 } = require('../controllers/simulated');
 
-const { validateParams } = require('../middlewares/validateRequest');
+const { validateParams, validateBody } = require('../middlewares/validateRequest');
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
 const { validateUuidSchema, validateUuidSchemaListQuestions } = require('../helpers/validators/genericSchema');
+const { createSimulatedSchema } = require('../helpers/validators/simulatedSquema');
 
 const routes = Router();
 
@@ -46,6 +47,7 @@ routes.post(
   '/simulated',
   authentication,
   validateAccessPermission(['super admin', 'student']),
+  validateBody(createSimulatedSchema),
   createSimulated,
 );
 
