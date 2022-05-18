@@ -130,7 +130,7 @@ async function consultAnswers(request, response) {
     answers.push(question);
   }
 
-  return response.status(200).json(answers);
+  return response.status(200).json(answers.reverse());
 }
 
 async function getRandomQuestions(request, response) {
