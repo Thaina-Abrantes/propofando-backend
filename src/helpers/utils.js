@@ -104,6 +104,7 @@ async function sortedQuestions(
       categoryId: allQuestionsAvailable[indexQuestionSorted].categoryId,
     });
 
+    // verificar se não existe questões duplicada antes de efetuar o push
     questionsSorted.push(questionSorted);
   }
 

@@ -9,8 +9,7 @@ const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
 
 async function createSimulated(request, response) {
-  const { userId, quantityQuestions } = request.body;
-  let { name } = request.body;
+  const { name, userId, quantityQuestions } = request.body;
 
   const simuladoActive = await simulatedRepository.findBy(
     { userId, active: true },
@@ -60,7 +59,7 @@ async function createSimulated(request, response) {
   const registerSimulatedQuestions = await simulatedSortQuestionsRepository
     .insertAll(questionsSorted);
 
-  // Refactor: Melhorar validações
+  // Refactor: Melhorar validações se necessesário
   if (!registeredSimulated) {
     return response.status(400).json({ message: 'Não foi possível criar o simulado.' });
   }
