@@ -14,7 +14,7 @@ const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
 const { validateUuidSchema, validateUuidSchemaListQuestions } = require('../helpers/validators/genericSchema');
-const { createSimulatedSchema } = require('../helpers/validators/simulatedSquema');
+const { createSimulatedSchema, simulatedIdSchema, answerSimulatedSchema } = require('../helpers/validators/simulatedSquema');
 
 const routes = Router();
 
@@ -55,6 +55,7 @@ routes.patch(
   '/simulated/finish',
   authentication,
   validateAccessPermission(['super admin', 'student']),
+  validateBody(simulatedIdSchema),
   finishSimulated,
 );
 
@@ -62,6 +63,7 @@ routes.patch(
   '/simulated',
   authentication,
   validateAccessPermission(['super admin', 'student']),
+  validateBody(answerSimulatedSchema),
   answerSimulated,
 );
 
