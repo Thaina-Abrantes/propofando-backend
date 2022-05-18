@@ -13,10 +13,10 @@ const { validateParams } = require('../middlewares/validateRequest');
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-// const { createCategorySchema } = require('../helpers/validators/categorySquema');
 const { validateUuidSchema, validateUuidSchemaListQuestions } = require('../helpers/validators/genericSchema');
 
 const routes = Router();
+
 routes.get(
   '/simulated/:simulatedId/user/:userId',
   authentication,
@@ -33,25 +33,34 @@ routes.get(
   consultAnswers,
 );
 
+routes.get(
+  '/simulated/:id',
+  authentication,
+  validateAccessPermission(['super admin', 'student']),
+  validateParams(validateUuidSchema),
+  listSimulated,
+);
+
 // Refactor: Aplicar middlawares
 routes.post(
   '/simulated',
+  authentication,
+  validateAccessPermission(['super admin', 'student']),
   createSimulated,
 );
 
 routes.patch(
   '/simulated/finish',
+  authentication,
+  validateAccessPermission(['super admin', 'student']),
   finishSimulated,
 );
 
 routes.patch(
   '/simulated',
+  authentication,
+  validateAccessPermission(['super admin', 'student']),
   answerSimulated,
-);
-
-routes.get(
-  '/simulated/:id',
-  listSimulated,
 );
 
 module.exports = routes;
