@@ -86,9 +86,12 @@ class QuestionRepository extends BaseRepository {
     }
 
     async getQuestionsAvailable(userId) {
-        const questions = knex('questions as q').whereNotExists(function () {
-            this.select('*').from('questions_sort_simulated as qss').whereRaw('q.id = qss."questionId"');
-          });
+        const questions = knex('questions as q')
+            .whereNotExists(function () {
+                this.select('*')
+                .from('questions_sort_simulated as qss')
+                .whereRaw(`q.id = qss."questionId" and qss."userId" = '${userId}'`);
+            });
 
         return questions;
     }
