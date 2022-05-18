@@ -28,12 +28,10 @@ async function createSimulated(request, response) {
     name = `Simulado ${allSimulatedSortUser.length}`;
   }
 
-  // Refactor: Trazer apenas questões diponiveis do usuario
   // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
 
-  const allQuestionRepository = await questionRepository.getQuestionsAvailable(userId);
-  console.log(allQuestionRepository, 'ques');
-  return response.status(200).json(allQuestionRepository);
+  const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId);
+  console.log(allQuestionsAvailable, 'ques');
 
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });
@@ -41,9 +39,9 @@ async function createSimulated(request, response) {
   const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
 
   if (
-    (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionRepository.length)
-    || (quantityQuestions > allQuestionRepository.length)
-    || (totalQuestions > allQuestionRepository.length)
+    (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionsAvailable.length)
+    || (quantityQuestions > allQuestionsAvailable.length)
+    || (totalQuestions > allQuestionsAvailable.length)
   ) {
     await simulatedRepository.delete(registeredSimulated.id);
     return response.status(400).json({ message: 'Sem questões disponiveis' });
@@ -55,7 +53,7 @@ async function createSimulated(request, response) {
     name,
     registeredSimulated,
     quantityQuestions,
-    allQuestionRepository,
+    allQuestionsAvailable,
     userId,
   );
 

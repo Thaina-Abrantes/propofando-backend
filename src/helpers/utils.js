@@ -87,43 +87,21 @@ async function sortedQuestions(
   name,
   registeredSimulated,
   quantityQuestions,
-  allQuestionRepository,
+  allQuestionsAvailable,
   userId,
 ) {
   const questionsSorted = [];
 
   for (let index = 0; index < quantityQuestions; index += 1) {
     const questionSorted = [];
-    let indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
-    let newSorted = false;
-
-    let questionSortedExists = await simulatedSortQuestionsRepository.findOneBy(
-      { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
-    );
-
-    /** Refatora */
-    if (questionSortedExists) {
-      newSorted = true;
-
-      while (newSorted) {
-        indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
-
-        questionSortedExists = await simulatedSortQuestionsRepository.findOneBy(
-          { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
-        );
-
-        if (!questionSortedExists && newSorted) {
-          newSorted = false;
-        }
-      }
-    }
+    const indexQuestionSorted = getRandomInt(0, allQuestionsAvailable.length - 1);
 
     Object.assign(questionSorted, {
       name,
       simulatedId: registeredSimulated.id,
       userId,
-      questionId: allQuestionRepository[indexQuestionSorted].id,
-      categoryId: allQuestionRepository[indexQuestionSorted].categoryId,
+      questionId: allQuestionsAvailable[indexQuestionSorted].id,
+      categoryId: allQuestionsAvailable[indexQuestionSorted].categoryId,
     });
 
     questionsSorted.push(questionSorted);
