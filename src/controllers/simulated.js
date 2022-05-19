@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 const { SimulatedRepository } = require('../repositories/SimulatedRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 const { QuestionRepository } = require('../repositories/QuestionRepository');
@@ -9,7 +8,8 @@ const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
 
 async function createSimulated(request, response) {
-  const { name, userId, quantityQuestions } = request.body;
+  const { userId, quantityQuestions, categories } = request.body;
+  let { name } = request.body;
 
   const simuladoActive = await simulatedRepository.findBy(
     { userId, active: true },
@@ -27,9 +27,7 @@ async function createSimulated(request, response) {
     name = `Simulado ${allSimulatedSortUser.length}`;
   }
 
-  // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
-
-  const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId);
+  const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId, categories);
   console.log(allQuestionsAvailable, 'ques');
 
   const registeredSimulated = await simulatedRepository

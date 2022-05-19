@@ -1,11 +1,8 @@
-/* eslint-disable no-await-in-loop */
 const { UserRepository } = require('../repositories/UserRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
-const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 
 const userRepository = new UserRepository();
 const categoryRepository = new CategoryRepository();
-const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 
 const err = {
   success: true,
