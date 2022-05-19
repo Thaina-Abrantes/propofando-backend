@@ -24,11 +24,10 @@ async function createSimulated(request, response) {
   );
 
   if (!name) {
-    name = `Simulado ${allSimulatedSortUser.length}`;
+    name = `Simulado ${allSimulatedSortUser.length + 1}`;
   }
 
   const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId, categories);
-  console.log(allQuestionsAvailable, 'ques');
 
   const registeredSimulated = await simulatedRepository
     .insert({ name, userId });

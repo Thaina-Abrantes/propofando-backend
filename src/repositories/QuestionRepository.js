@@ -94,9 +94,15 @@ class QuestionRepository extends BaseRepository {
                 .whereRaw('q.id = qss."questionId"')
                 .andWhere('qss.userId', userId);
             });
-          }).select('*').from('with_alias').whereIn('with_alias.categoryId', categories);
-
-        return questions;
+          })
+          .select('*')
+          .from('with_alias')
+          .where((qb) => {
+            if (categories) {
+                qb.whereIn('with_alias.categoryId', categories);
+            }
+        });
+return questions;
     }
 
     async answeredQuestionCorrectly(pageNumber, size) {
