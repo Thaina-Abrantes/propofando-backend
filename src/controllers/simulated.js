@@ -33,6 +33,10 @@ async function createSimulated(request, response) {
     .withTransaction(transaction)
     .insert({ name, userId });
 
+  if (!registeredSimulated) {
+    return response.status(400).json({ message: 'Não foi possível criar o simulado.' });
+  }
+
   const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
 
   if (
@@ -57,10 +61,6 @@ async function createSimulated(request, response) {
     .insertAll(questionsSorted);
 
   // Refactor: Melhorar validações se necessesário
-  if (!registeredSimulated) {
-    return response.status(400).json({ message: 'Não foi possível criar o simulado.' });
-  }
-
   if (!registerSimulatedQuestions) {
     await simulatedRepository.delete({ id: registeredSimulated.id });
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
