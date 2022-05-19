@@ -21,11 +21,11 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Existe um simulado ativo' });
   }
 
-  const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
-    { userId },
-  );
-
   const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId, categories);
+
+  if (quantityQuestions > allQuestionsAvailable.length) {
+    return response.status(400).json({ message: 'Sem questões disponíveis' });
+  }
 
   const transaction = await generateTransaction();
 
@@ -35,16 +35,6 @@ async function createSimulated(request, response) {
 
   if (!registeredSimulated) {
     return response.status(400).json({ message: 'Não foi possível criar o simulado.' });
-  }
-
-  const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
-
-  if (
-    (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionsAvailable.length)
-    || (quantityQuestions > allQuestionsAvailable.length)
-    || (totalQuestions > allQuestionsAvailable.length)
-  ) {
-    return response.status(400).json({ message: 'Sem questões disponiveis' });
   }
 
   let questionsSorted = [];
@@ -60,9 +50,7 @@ async function createSimulated(request, response) {
     .withTransaction(transaction)
     .insertAll(questionsSorted);
 
-  // Refactor: Melhorar validações se necessesário
   if (!registerSimulatedQuestions) {
-    await simulatedRepository.delete({ id: registeredSimulated.id });
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
 
