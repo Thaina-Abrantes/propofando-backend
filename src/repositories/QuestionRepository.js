@@ -102,7 +102,7 @@ class QuestionRepository extends BaseRepository {
                 qb.whereIn('with_alias.categoryId', categories);
             }
         });
-return questions;
+        return questions;
     }
 
     async answeredQuestionCorrectly(pageNumber, size) {

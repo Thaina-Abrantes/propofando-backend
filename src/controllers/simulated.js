@@ -2,14 +2,16 @@ const { SimulatedRepository } = require('../repositories/SimulatedRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { sortedQuestions } = require('../helpers/utils');
+const { generateTransaction } = require('../helpers/handleTransaction');
 
 const simulatedRepository = new SimulatedRepository();
 const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
 
 async function createSimulated(request, response) {
-  const { userId, quantityQuestions, categories } = request.body;
-  let { name } = request.body;
+  const {
+    name, userId, quantityQuestions, categories,
+  } = request.body;
 
   const simuladoActive = await simulatedRepository.findBy(
     { userId, active: true },
@@ -23,13 +25,12 @@ async function createSimulated(request, response) {
     { userId },
   );
 
-  if (!name) {
-    name = `Simulado ${allSimulatedSortUser.length + 1}`;
-  }
-
   const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId, categories);
 
+  const transaction = await generateTransaction();
+
   const registeredSimulated = await simulatedRepository
+    .withTransaction(transaction)
     .insert({ name, userId });
 
   const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
@@ -39,11 +40,9 @@ async function createSimulated(request, response) {
     || (quantityQuestions > allQuestionsAvailable.length)
     || (totalQuestions > allQuestionsAvailable.length)
   ) {
-    await simulatedRepository.delete(registeredSimulated.id);
     return response.status(400).json({ message: 'Sem questões disponiveis' });
   }
 
-  // Feat: Aplicar sorteio por proporções de categorias disponiveis
   let questionsSorted = [];
   questionsSorted = await sortedQuestions(
     name,
@@ -54,6 +53,7 @@ async function createSimulated(request, response) {
   );
 
   const registerSimulatedQuestions = await simulatedSortQuestionsRepository
+    .withTransaction(transaction)
     .insertAll(questionsSorted);
 
   // Refactor: Melhorar validações se necessesário
@@ -65,6 +65,8 @@ async function createSimulated(request, response) {
     await simulatedRepository.delete({ id: registeredSimulated.id });
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
+
+  transaction.commit();
 
   return response.status(201).json(registeredSimulated);
 }

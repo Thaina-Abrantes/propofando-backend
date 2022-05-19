@@ -5,7 +5,7 @@ const { setLocale } = require('yup');
 setLocale(pt);
 
 const createSimulatedSchema = yup.object().shape({
-  name: yup.string(),
+  name: yup.string().required('É necessário fornecer um nome para o simulado.'),
 
   userId: yup.string()
     .uuid('Formato não corresponde a um uuid')
