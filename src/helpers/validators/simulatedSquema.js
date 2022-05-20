@@ -15,7 +15,8 @@ const createSimulatedSchema = yup.object().shape({
     .positive('Informe um número maior que zero')
     .required('Quantidade de questões é obrigatório'),
 
-  categories: yup.array(),
+  categories: yup.array()
+    .min(1, 'Selecione pelo menos uma categoria'),
 });
 
 const simulatedIdSchema = yup.object().shape({
