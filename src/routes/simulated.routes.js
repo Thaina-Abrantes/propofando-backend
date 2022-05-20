@@ -46,7 +46,7 @@ routes.get(
 routes.post(
   '/simulated',
   authentication,
-  validateAccessPermission(['super admin', 'student']),
+  validateAccessPermission(['student']),
   validateBody(createSimulatedSchema),
   createSimulated,
 );
@@ -54,7 +54,7 @@ routes.post(
 routes.patch(
   '/simulated/finish',
   authentication,
-  validateAccessPermission(['super admin', 'student']),
+  validateAccessPermission(['student']),
   validateBody(simulatedIdSchema),
   finishSimulated,
 );
@@ -62,7 +62,7 @@ routes.patch(
 routes.patch(
   '/simulated',
   authentication,
-  validateAccessPermission(['super admin', 'student']),
+  validateAccessPermission(['student']),
   validateBody(answerSimulatedSchema),
   answerSimulated,
 );
