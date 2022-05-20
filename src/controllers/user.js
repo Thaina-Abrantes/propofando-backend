@@ -304,7 +304,7 @@ async function reportProblem(request, response) {
 async function performanceUser(request, response) {
     const { id: userId } = request.params;
 
-    const totalSimulateds = await simulatedRepository.count({ userId });
+    const totalSimulateds = await simulatedRepository.count({ userId, active: false });
 
     const totalQuestionsAnswered = await simulatedSortQuestionsRepository
         .count({ userId, answered: true });
