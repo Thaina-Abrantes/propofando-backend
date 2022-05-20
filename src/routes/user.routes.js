@@ -75,7 +75,7 @@ routes.get(
 routes.get(
     '/users/:id/performance',
     authentication,
-    validateAccessPermission(['student']),
+    validateAccessPermission(['super admin','student']),
     validateParams(validateUuidSchema),
     performanceUser,
 
