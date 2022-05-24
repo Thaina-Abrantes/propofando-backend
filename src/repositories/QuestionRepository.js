@@ -77,6 +77,34 @@ class QuestionRepository extends BaseRepository {
         return questions;
     }
 
+    async getAllQuestions() {
+        const totalQuestions = await knex('questions').count('*');
+
+        const { count: numberOfquestions } = totalQuestions[0];
+
+        return numberOfquestions;
+    }
+
+    async getQuestionsAvailable(userId, categories) {
+        const questions = knex.with('with_alias', (qb) => {
+            qb.select('*').from('questions as q')
+            .whereNotExists(function () {
+                this.select('*')
+                .from('questions_sort_simulated as qss')
+                .whereRaw('q.id = qss."questionId"')
+                .andWhere('qss.userId', userId);
+            });
+          })
+          .select('*')
+          .from('with_alias')
+          .where((qb) => {
+            if (categories) {
+                qb.whereIn('with_alias.categoryId', categories);
+            }
+        });
+        return questions;
+    }
+
     async answeredQuestionCorrectly(pageNumber, size) {
         pageNumber = pageNumber || 1;
         size = size || 6;
@@ -118,14 +146,6 @@ class QuestionRepository extends BaseRepository {
 
         return questionAnsweredCorrectly;
     }
-
-    async getAllQuestions() {
-        const totalQuestions = await knex('questions').count('*');
-
-        const { count: numberOfquestions } = totalQuestions[0];
-
-        return numberOfquestions;
-}
 
     async getTotalUsersAnswered(id) {
         const totalUsersAnswered = await knex('questions_sort_simulated as qsimulated')

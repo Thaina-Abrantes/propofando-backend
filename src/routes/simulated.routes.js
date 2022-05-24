@@ -9,14 +9,15 @@ const {
   finishSimulated,
 } = require('../controllers/simulated');
 
-const { validateParams } = require('../middlewares/validateRequest');
+const { validateParams, validateBody } = require('../middlewares/validateRequest');
 const authentication = require('../middlewares/authentication');
 const validateAccessPermission = require('../middlewares/validateAccessPermission');
 
-// const { createCategorySchema } = require('../helpers/validators/categorySquema');
 const { validateUuidSchema, validateUuidSchemaListQuestions } = require('../helpers/validators/genericSchema');
+const { createSimulatedSchema, simulatedIdSchema, answerSimulatedSchema } = require('../helpers/validators/simulatedSquema');
 
 const routes = Router();
+
 routes.get(
   '/simulated/:simulatedId/user/:userId',
   authentication,
@@ -33,25 +34,37 @@ routes.get(
   consultAnswers,
 );
 
+routes.get(
+  '/simulated/:id',
+  authentication,
+  validateAccessPermission(['super admin', 'student']),
+  validateParams(validateUuidSchema),
+  listSimulated,
+);
+
 // Refactor: Aplicar middlawares
 routes.post(
   '/simulated',
+  authentication,
+  validateAccessPermission(['student']),
+  validateBody(createSimulatedSchema),
   createSimulated,
 );
 
 routes.patch(
   '/simulated/finish',
+  authentication,
+  validateAccessPermission(['student']),
+  validateBody(simulatedIdSchema),
   finishSimulated,
 );
 
 routes.patch(
   '/simulated',
+  authentication,
+  validateAccessPermission(['student']),
+  validateBody(answerSimulatedSchema),
   answerSimulated,
-);
-
-routes.get(
-  '/simulated/:id',
-  listSimulated,
 );
 
 module.exports = routes;

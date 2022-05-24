@@ -1,24 +1,17 @@
-/* eslint-disable no-await-in-loop */
 const { SimulatedRepository } = require('../repositories/SimulatedRepository');
 const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 const { QuestionRepository } = require('../repositories/QuestionRepository');
 const { sortedQuestions } = require('../helpers/utils');
+const { generateTransaction } = require('../helpers/handleTransaction');
 
 const simulatedRepository = new SimulatedRepository();
 const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 const questionRepository = new QuestionRepository();
 
 async function createSimulated(request, response) {
-  const { userId, quantityQuestions } = request.body;
-  let { name } = request.body;
-
-  let questionsSorted = [];
-
-  // Refactor: Trazer apenas questões diponiveis do usuario
-  // Refactor: Trazer apenas questões diponiveis do usuario por categoria escolhida se for o caso
-  const allSimulatedSortUser = await simulatedSortQuestionsRepository.findBy(
-    { userId },
-  );
+  const {
+    name, userId, quantityQuestions, categories,
+  } = request.body;
 
   const simuladoActive = await simulatedRepository.findBy(
     { userId, active: true },
@@ -28,47 +21,40 @@ async function createSimulated(request, response) {
     return response.status(400).json({ message: 'Existe um simulado ativo' });
   }
 
-  if (!name) {
-    name = `Simulado ${allSimulatedSortUser.length}`;
+  const allQuestionsAvailable = await questionRepository.getQuestionsAvailable(userId, categories);
+
+  if (quantityQuestions > allQuestionsAvailable.length) {
+    return response.status(400).json({ message: 'Sem questões disponíveis' });
   }
 
-  const allQuestionRepository = await questionRepository.findAll();
+  const transaction = await generateTransaction();
 
   const registeredSimulated = await simulatedRepository
+    .withTransaction(transaction)
     .insert({ name, userId });
 
-  const totalQuestions = allSimulatedSortUser.length + quantityQuestions;
-
-  if (
-    (allSimulatedSortUser && allSimulatedSortUser.length === allQuestionRepository.length)
-    || (quantityQuestions > allQuestionRepository.length)
-    || (totalQuestions > allQuestionRepository.length)
-  ) {
-    await simulatedRepository.delete(registeredSimulated.id);
-    return response.status(400).json({ message: 'Sem questões disponiveis' });
-  }
-
-  // Feat: Aplicar sorteio por proporções de categorias disponiveis
-  questionsSorted = await sortedQuestions(
-    name,
-    registeredSimulated,
-    quantityQuestions,
-    allQuestionRepository,
-    userId,
-  );
-
-  const registerSimulatedQuestions = await simulatedSortQuestionsRepository
-    .insertAll(questionsSorted);
-
-  // Refactor: Melhorar validações
   if (!registeredSimulated) {
     return response.status(400).json({ message: 'Não foi possível criar o simulado.' });
   }
 
+  let questionsSorted = [];
+  questionsSorted = await sortedQuestions(
+    name,
+    registeredSimulated,
+    quantityQuestions,
+    allQuestionsAvailable,
+    userId,
+  );
+
+  const registerSimulatedQuestions = await simulatedSortQuestionsRepository
+    .withTransaction(transaction)
+    .insertAll(questionsSorted);
+
   if (!registerSimulatedQuestions) {
-    await simulatedRepository.delete({ id: registeredSimulated.id });
     return response.status(400).json({ message: 'Não foi possível sortear as questões' });
   }
+
+  transaction.commit();
 
   return response.status(201).json(registeredSimulated);
 }
@@ -130,7 +116,7 @@ async function consultAnswers(request, response) {
     answers.push(question);
   }
 
-  return response.status(200).json(answers);
+  return response.status(200).json(answers.reverse());
 }
 
 async function getRandomQuestions(request, response) {

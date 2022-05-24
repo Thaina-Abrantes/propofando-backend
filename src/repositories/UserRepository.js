@@ -45,5 +45,28 @@ class UserRepository extends BaseRepository {
 
              return users;
     }
+
+    async getAllUsers() {
+        const listAllUsers = await knex('users as u')
+        .leftJoin('simulated as s', 's.userId', 'u.id')
+        .leftJoin('questions_sort_simulated as qss', 'qss.simulatedId', 's.id')
+        .leftJoin('alternatives as a', 'a.questionId', 'qss.questionId')
+        .select(
+            'u.id',
+            'u.name',
+            'u.email',
+            'u.active',
+            'u.userType',
+            knex.raw('count(*) filter(where qss."altenativeId"= a.id and a.correct = true) as corrects'),
+        )
+        .where({
+            'u.userType': 'student',
+            'u.active': true,
+        })
+        .groupBy('u.id', 'qss.userId')
+        .returning('*');
+
+        return listAllUsers;
+    }
 }
 module.exports = { UserRepository };

@@ -18,13 +18,15 @@ class SimulatedRepository extends BaseRepository {
         'q.description',
         'q.categoryId',
         'q.image',
+        'qss.id',
+        'qss.altenativeId',
         knex.raw("JSON_AGG(JSON_BUILD_OBJECT('id', a.id, 'option', a.option, 'description', a.description)) as alternatives"),
       )
       .where({
         'qss.simulatedId': simulatedId,
         'qss.userId': userId,
       })
-      .groupBy('q.id')
+      .groupBy('qss.id', 'q.id')
       .returning('*');
 
     return randomQuestions;

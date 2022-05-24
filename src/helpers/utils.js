@@ -1,11 +1,8 @@
-/* eslint-disable no-await-in-loop */
 const { UserRepository } = require('../repositories/UserRepository');
 const { CategoryRepository } = require('../repositories/CategoryRepository');
-const { SimulatedSortQuestionsRepository } = require('../repositories/SimulatedSortQuestionsRepository');
 
 const userRepository = new UserRepository();
 const categoryRepository = new CategoryRepository();
-const simulatedSortQuestionsRepository = new SimulatedSortQuestionsRepository();
 
 const err = {
   success: true,
@@ -87,46 +84,26 @@ async function sortedQuestions(
   name,
   registeredSimulated,
   quantityQuestions,
-  allQuestionRepository,
+  allQuestionsAvailable,
   userId,
 ) {
   const questionsSorted = [];
 
   for (let index = 0; index < quantityQuestions; index += 1) {
     const questionSorted = [];
-    let indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
-    let newSorted = false;
-
-    let questionSortedExists = await simulatedSortQuestionsRepository.findOneBy(
-      { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
-    );
-
-    /** Refatora */
-    if (questionSortedExists) {
-      newSorted = true;
-
-      while (newSorted) {
-        indexQuestionSorted = getRandomInt(0, allQuestionRepository.length - 1);
-
-        questionSortedExists = await simulatedSortQuestionsRepository.findOneBy(
-          { userId, questionId: allQuestionRepository[indexQuestionSorted].id },
-        );
-
-        if (!questionSortedExists && newSorted) {
-          newSorted = false;
-        }
-      }
-    }
+    const indexQuestionSorted = getRandomInt(0, allQuestionsAvailable.length - 1);
 
     Object.assign(questionSorted, {
       name,
       simulatedId: registeredSimulated.id,
       userId,
-      questionId: allQuestionRepository[indexQuestionSorted].id,
-      categoryId: allQuestionRepository[indexQuestionSorted].categoryId,
+      questionId: allQuestionsAvailable[indexQuestionSorted].id,
+      categoryId: allQuestionsAvailable[indexQuestionSorted].categoryId,
     });
 
     questionsSorted.push(questionSorted);
+
+    allQuestionsAvailable.splice(indexQuestionSorted, 1);
   }
 
   return questionsSorted;

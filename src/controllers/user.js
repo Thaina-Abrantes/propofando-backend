@@ -45,13 +45,23 @@ async function getUser(request, response) {
 async function listUsers(_, response) {
     const allUsers = await userRepository.findBy({ deleted: false, userType: 'student' });
 
+    const listAll = await userRepository.getAllUsers();
+    const numberOfQuestions = await questionRepository.getAllQuestions();
+    listAll.forEach((student) => {
+        if (numberOfQuestions <= 0) {
+            student.corrects = 0;
+        } else {
+            student.corrects = ((Number(student.corrects) / numberOfQuestions).toFixed(2)) * 100;
+        }
+    });
+
     const cleanedUsers = [];
 
     for (const user of allUsers) {
         cleanedUsers.push(clearUserObject(user));
     }
 
-    return response.status(201).json(cleanedUsers);
+    return response.status(201).json(listAll);
 }
 async function listUserPaginated(request, response) {
     const { page, size } = request.query;
